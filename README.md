@@ -39,6 +39,9 @@ Command line program to validate and convert [`CITATION.cff`](https://github.com
 7. Zenodo JSON
 
 `cffconvert` does not support converting items from `references` or `preferred-citation` keys at the moment.
+The `contact` key is currently validation-only. `license-url` is preserved in schema.org and CodeMeta output, but is
+validation-only for the other formats. Zenodo output supports one SPDX license per record and raises an error when a
+CFF file specifies multiple licenses.
 
 ## Installing
 
@@ -55,6 +58,30 @@ which cffconvert
 should now return the location of the program.
 
 See [docs/alternative-install-options.md](docs/alternative-install-options.md) for alternative install options.
+
+## Installing from source
+
+To install `cffconvert` directly from this Git repository:
+
+```shell
+python3 -m pip install --user git+https://github.com/citation-file-format/cffconvert.git
+```
+
+Or, to install a specific branch, tag, or commit:
+
+```shell
+python3 -m pip install --user git+https://github.com/citation-file-format/cffconvert.git@<ref>
+```
+
+Replace `<ref>` with a branch name, tag, or commit SHA (e.g. `main`, `3.0.0`, or `054bda5`).
+
+For a local development install, clone the repository and install in editable mode:
+
+```shell
+git clone https://github.com/citation-file-format/cffconvert.git
+cd cffconvert
+python3 -m pip install --user --editable .[dev,testing]
+```
 
 ## Docker
 
@@ -81,6 +108,10 @@ repos:
     hooks:
       - id: validate-cff
 ```
+
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing, and release procedures.
 
 ## Command line interface
 

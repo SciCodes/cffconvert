@@ -20,6 +20,9 @@ The schema changes are preliminary and temporary, since they are developed in an
 1. Added conversion and validation behavior for CFF 1.3
 1. Converted metadata now includes information from CFF 1.3 key `contributors` for target formats that support it [https://github.com/citation-file-format/cffconvert/issues/333](https://github.com/citation-file-format/cffconvert/issues/333), [https://github.com/citation-file-format/cffconvert/issues/334](https://github.com/citation-file-format/cffconvert/issues/334)
 1. Zenodo metadata now includes `related_identifiers` and optionally `relation_type` such as `citedBy`, `compiles`, `isSupplementTo` etc using CFF 1.3 key `relation` on elements in `identifiers` [https://github.com/citation-file-format/cffconvert/pull/327](https://github.com/citation-file-format/cffconvert/pull/327), [https://github.com/citation-file-format/cffconvert/pull/329](https://github.com/citation-file-format/cffconvert/pull/329)
+1. CFF 1.3 ROR identifiers are validated correctly and preserved in schema.org and CodeMeta output.
+1. Schema.org and CodeMeta output preserve `license-url` and multiple licenses; Zenodo conversion reports unsupported multiple licenses and creator records without names instead of producing invalid metadata.
+1. Zenodo identifier relations preserve every relation supported by the legacy Zenodo schema and report unsupported version relations instead of changing their meaning.
 1. Converted metadata now uses author `email` for target formats that support it [https://github.com/citation-file-format/cffconvert/issues/285](https://github.com/citation-file-format/cffconvert/issues/285)
 1. `entity` authors get exported as `Organization` when converting to `schema.org` or `codemeta` (was `Person`) [https://github.com/citation-file-format/cffconvert/issues/239](https://github.com/citation-file-format/cffconvert/issues/239)
 1. CFF key `name` takes precedence over `alias` when converting entity authors (was the other way around) [https://github.com/citation-file-format/cffconvert/issues/308](https://github.com/citation-file-format/cffconvert/issues/308)
@@ -209,4 +212,3 @@ The schema changes are preliminary and temporary, since they are developed in an
 -   added showing its own version (`--version`)
 -   command line argument `--ignore-suspect-keys` no longer needs to be
     assigned a value, it's simply a flag
-

@@ -81,15 +81,14 @@ class ZenodoObjectShared:
 
     def add_related_identifiers(self):
         def map_relation_type(rel):
-            condition = rel is None or rel in [
-                "HasMetadata",
+            if rel in [
                 "HasVersion",
-                "IsMetadataFor",
-                "IsOriginalFormOf",
-                "IsVariantFormOf",
                 "IsVersionOf"
-            ]
-            return None if condition else rel[0].lower() + rel[1:]
+            ]:
+                raise ValueError(f"Zenodo does not support the identifier relation '{rel}'.")
+            if rel == "IsOriginalFormOf":
+                return "isOrignialFormOf"
+            return None if rel is None else rel[0].lower() + rel[1:]
 
         seen = []
         related_identifiers = []

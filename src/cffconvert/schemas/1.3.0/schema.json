@@ -1860,7 +1860,7 @@
             ],
             "maxLength": 25,
             "minLength": 25,
-            "pattern": "^https://ror.org/0[0-9|a-z]{8}$",
+            "pattern": "^https://ror.org/0[0-9a-z]{8}$",
             "type": "string"
         },
         "strictish-string": {

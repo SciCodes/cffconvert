@@ -20,6 +20,10 @@ pycodestyle:
   full: true
   disable:
     - E501 # line length
+    - E201 # whitespace after opening delimiter; handled by Ruff where supported
+    - E202 # whitespace before closing delimiter; handled by Ruff where supported
+    - E221 # multiple spaces before operator; retained in aligned output tables
+    - E231 # missing whitespace after delimiter; handled by Ruff where supported
 
 pylint:
     run: false

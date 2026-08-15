@@ -14,10 +14,10 @@ class ZenodoObject(Shared):
             # contributors are generated in the same way as authors, hence just
             # call ZenodoAuthor's contructor with the cff contributor object
             contributor = ZenodoAuthor(c).as_dict()
+            if contributor is None or contributor.get("name") is None:
+                continue
             contributor.update({"type": "Other"})
             contributors.append(contributor)
-        # filter out contributors that had no data associated with them
-        contributors = [c for c in contributors if c is not None]
         if len(contributors) > 0:
             self.contributors = contributors
         return self
@@ -25,7 +25,19 @@ class ZenodoObject(Shared):
     def add_creators(self):
         authors_cff = self.cffobj.get("authors", [])
         creators_zenodo = [ZenodoAuthor(a).as_dict() for a in authors_cff]
-        self.creators = [c for c in creators_zenodo if c is not None]
+        if any(creator is None or creator.get("name") is None for creator in creators_zenodo):
+            raise ValueError("Zenodo requires every creator to have a name.")
+        self.creators = creators_zenodo
+        return self
+
+    def add_license(self):
+        license_value = self.cffobj.get("license")
+        if isinstance(license_value, list):
+            if len(license_value) > 1:
+                raise ValueError("Zenodo supports only one license per record.")
+            license_value = license_value[0]
+        if license_value is not None:
+            self.license = {"id": license_value}
         return self
 
     def add_publication_date(self):

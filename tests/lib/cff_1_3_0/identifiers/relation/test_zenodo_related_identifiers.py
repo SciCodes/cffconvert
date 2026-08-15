@@ -19,6 +19,7 @@ def get_relation_types():
         "Continues",
         "Describes",
         "Documents",
+        "HasMetadata",
         "HasPart",
         "IsCitedBy",
         "IsCompiledBy",
@@ -27,6 +28,7 @@ def get_relation_types():
         "IsDescribedBy",
         "IsDocumentedBy",
         "IsIdenticalTo",
+        "IsMetadataFor",
         "IsNewVersionOf",
         "IsObsoletedBy",
         "IsPartOf",
@@ -38,6 +40,7 @@ def get_relation_types():
         "IsSourceOf",
         "IsSupplementedBy",
         "IsSupplementTo",
+        "IsVariantFormOf",
         "Obsoletes",
         "References",
         "Requires",
@@ -47,11 +50,7 @@ def get_relation_types():
 
 def get_relation_types_skip():
     return [
-        "HasMetadata",
         "HasVersion",
-        "IsMetadataFor",
-        "IsOriginalFormOf",
-        "IsVariantFormOf",
         "IsVersionOf"
     ]
 
@@ -82,15 +81,18 @@ def test_with_relation_unmapped(expected):
     cffstr = get_cffstr().replace("IsCompiledBy", expected)
     citation = Citation(cffstr)
     zenodo_object = ZenodoObject(citation.cffobj, initialize_empty=True)
+    with pytest.raises(ValueError, match="Zenodo does not support the identifier relation"):
+        zenodo_object.add_related_identifiers()
+
+
+@pytest.mark.lib
+@pytest.mark.zenodo
+def test_original_form_relation_uses_zenodo_legacy_spelling():
+    cffstr = get_cffstr().replace("IsCompiledBy", "IsOriginalFormOf")
+    citation = Citation(cffstr)
+    zenodo_object = ZenodoObject(citation.cffobj, initialize_empty=True)
     related_identifiers = zenodo_object.add_related_identifiers().related_identifiers
-    assert related_identifiers is not None
-    assert isinstance(related_identifiers, list)
-    assert len(related_identifiers) > 0
-    # pylint: disable=unsubscriptable-object
-    assert isinstance(related_identifiers[0], dict)
-    # pylint: disable=unsubscriptable-object
-    actual = related_identifiers[0].get("relation")
-    assert actual == "isSupplementedBy"
+    assert related_identifiers[0]["relation"] == "isOrignialFormOf"
 
 
 @pytest.mark.lib
@@ -108,3 +110,13 @@ def test_without_relation():
     # pylint: disable=unsubscriptable-object
     relation = related_identifiers[0].get("relation")
     assert relation == "isSupplementedBy"
+
+
+@pytest.mark.lib
+@pytest.mark.zenodo
+def test_complete_zenodo_output_matches_fixture():
+    citation = Citation(get_cffstr())
+    fixture = os.path.join(os.path.dirname(__file__), ".zenodo.json")
+    with open(fixture, "rt", encoding="utf-8") as f:
+        expected = f.read()
+    assert citation.as_zenodo() == expected

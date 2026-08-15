@@ -5,12 +5,23 @@
 ## Setup
 
 ```shell
-python3 -m venv venv && source venv/bin/activate
-pip install --upgrade pip wheel setuptools
-pip install --editable .[dev,testing]           # dev tooling + test deps
+uv venv && source .venv/bin/activate
+uv pip install --editable .[dev,testing]           # dev tooling + test deps
+```
+
+Alternatively, use the Makefile targets:
+
+```shell
+make dev-install    # install with dev + testing deps (editable)
+make test            # run full test suite
+make test-version    # run version-consistency checks
+make lint            # isort, ruff, prospector, pyroma
+make precommit       # run all pre-commit hooks
 ```
 
 Requires Python ≥ 3.8. Source under `src/cffconvert/` (setuptools `find` from `src/`).
+
+**Always run commands inside the Docker sandbox and prefer Makefile targets over raw commands.** Use `make docker-build` to build the image and `make docker-run ARGS="…"` to execute `cffconvert` inside the container. For test and lint targets, run them within the container or via `uv pip install --system --editable .[dev,testing]` inside the sandbox — never run `uv run` or `make` targets directly on the host.
 
 ## Validation commands
 
@@ -30,6 +41,7 @@ Pytest markers are registered in `pyproject.toml` — do not introduce unregiste
 ## Invariants and constraints
 
 - **Version sync**: the version string must match across `pyproject.toml`, `CITATION.cff`, `.zenodo.json`, and `Dockerfile`. Enforced by `tests/test_consistent_versioning.py`.
+- **Dockerfile**: uses a multi-stage build with `ghcr.io/astral-sh/uv:debian` as the builder stage and `python:3.12-slim` as the runtime stage. The Dockerfile version is checked by `test_dockerfile` in `tests/test_consistent_versioning.py` via the regex `cffconvert==<version>`.
 - **Style**: line length 120, double quotes, single-line imports, force-sorted within sections (`known_first_party = ["cffconvert"]`). Config in `pyproject.toml` (`[tool.isort]`, `[tool.ruff]`, `[tool.ruff.flake8-quotes]`).
 - **YAML parsing**: use `ruamel.yaml` with `typ="safe"`; timestamps must be loaded as strings (see `YAML_TIMESTAMP_TYPE` in `src/cffconvert/lib/constants.py` and each `citation.py`).
 - **Schema loading**: JSON schemas live in `src/cffconvert/schemas/<version>/schema.json`, loaded at runtime via `get_package_root()` from `src/cffconvert/root.py`.

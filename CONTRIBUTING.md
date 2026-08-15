@@ -60,3 +60,126 @@ let this discourage you from making the pull request; we can help you! Just go
 ahead and submit the pull request, but keep in mind that you might be asked to
 append additional commits to your pull request.
 
+## For maintainers
+
+### Development setup
+
+Install with dev and testing dependencies in an editable environment:
+
+```shell
+uv venv && source .venv/bin/activate
+uv pip install --editable .[dev,testing]
+```
+
+Or use the Makefile:
+
+```shell
+make dev-install    # install with dev + testing deps (editable)
+make test           # run the full test suite
+make test-version   # run version-consistency checks only
+make lint           # run isort, ruff, prospector, pyroma
+make precommit      # run all pre-commit hooks
+```
+
+### Packaging
+
+Build source and wheel distributions, then validate them:
+
+```shell
+make clean        # remove stale build artifacts
+make build        # build sdist + wheel into dist/
+make check-dist   # twine check dist/*
+```
+
+### Release preparation
+
+Before publishing, update the version **everywhere** it must be synchronized.
+The version is checked for consistency by `tests/test_consistent_versioning.py`
+across these files:
+
+1. `pyproject.toml` — `version = "X.Y.Z"`
+2. `CITATION.cff` — `version: X.Y.Z`
+3. `.zenodo.json` — `"version": "X.Y.Z"`
+4. `Dockerfile` — `cffconvert==X.Y.Z` (single `RUN` line)
+5. `docs/alternative-install-options.md` — `docker build --tag cffconvert:X.Y.Z .`
+6. `README.dev.md` — multiple patterns (requires line, docker tag, docker push)
+
+Update the version in all of the above, then run:
+
+```shell
+make test-version   # verify version consistency
+make release-check  # full local validation gate (clean, lint, test, test-version, build, check-dist)
+```
+
+`make release-check` runs the complete local validation gate. It never publishes
+anything — it only verifies that the package is ready for release.
+
+### TestPyPI (optional dry run)
+
+To verify the package installs cleanly from a real index before a production
+release, publish to TestPyPI:
+
+```shell
+make publish-test   # builds, checks, and uploads to TestPyPI
+```
+
+This requires a `~/.pypirc` entry for `testpypi` or `TWINE_USERNAME` /
+`TWINE_PASSWORD` environment variables pointing at a TestPyPI account.
+
+### Production release procedure
+
+Production releases are published to PyPI **exclusively** via GitHub Releases
+and PyPI Trusted Publishing. There is no `make publish` target for production.
+
+**Steps:**
+
+1. Ensure `main` is green (CI passes) and `make release-check` succeeds locally.
+2. Update `CHANGELOG.md` with the release notes for the new version.
+3. Commit and push all version changes to `main`.
+4. Create a **GitHub Release** on the `citation-file-format/cffconvert` repository:
+   - Tag name: the version string from `pyproject.toml` (e.g. `3.0.0`).
+   - Title: the version string (e.g. `3.0.0`).
+   - Description: paste the relevant `CHANGELOG.md` section.
+5. Publishing the GitHub Release triggers the
+   [`publish-to-pypi`](.github/workflows/publish-to-pypi.yml) workflow:
+   - Checks out the exact release tag.
+   - Verifies the tag matches `pyproject.toml` version.
+   - Builds sdist + wheel.
+   - Runs `twine check dist/*`.
+   - Uploads to PyPI using **Trusted Publishing** (OIDC, no API tokens).
+6. After PyPI publication succeeds, the existing
+   [`zenodraft`](.github/workflows/zenodraft.yml) workflow creates a Zenodo
+   deposit draft (triggered by the same release event).
+
+### PyPI Trusted Publishing configuration
+
+Trusted Publishing is configured on the PyPI side (no API tokens in GitHub
+Secrets). The GitHub Actions workflow uses `pypa/gh-action-pypi-publish@release/v1`
+with `permissions: id-token: write` and `environment: pypi`.
+
+**PyPI settings (configured once by a project admin):**
+
+| Setting | Value |
+|---------|-------|
+| PyPI project | `cffconvert` |
+| Owner | `citation-file-format` (or `SciCodes`) |
+| Repository | `citation-file-format/cffconvert` |
+| Workflow filename | `publish-to-pypi.yml` |
+| Environment name | `pypi` |
+
+See the [PyPI Trusted Publishing
+docs](https://docs.pypi.org/trusted-publishers/) for setup details.
+
+### Release checklist
+
+- [ ] All version files updated (`pyproject.toml`, `CITATION.cff`, `.zenodo.json`, `Dockerfile`, `docs/alternative-install-options.md`, `README.dev.md`)
+- [ ] `CHANGELOG.md` updated with release notes
+- [ ] `make test-version` passes (version consistency)
+- [ ] `make release-check` passes (full local gate)
+- [ ] CI green on `main`
+- [ ] GitHub Release created with tag matching `pyproject.toml` version
+- [ ] `publish-to-pypi` workflow completed successfully
+- [ ] `zenodraft` workflow completed (Zenodo deposit created)
+- [ ] PyPI page shows new version: <https://pypi.org/project/cffconvert/>
+- [ ] (Optional) Docker image built and pushed to DockerHub
+

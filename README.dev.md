@@ -9,48 +9,38 @@ git clone https://github.com/citation-file-format/cffconvert.git
 # change directory into cffconvert
 cd cffconvert
 
-# make a virtual environment named venv
-python3 -m venv venv
-
-# activate the virtual environment
-source venv/bin/activate
-
-# upgrade pip, wheel, setuptools
-pip install --upgrade pip wheel setuptools
-
-# install cffconvert  in editable mode
-pip install --editable .
+# create a virtual environment and install cffconvert with dev and testing dependencies
+uv venv && source .venv/bin/activate
+uv pip install --editable .[dev,testing]
 ```
 
-There are various sets of dependencies that you should install depending on the work you're planning to do.
+There are various sets of dependencies that you may want to install depending on the work you're planning to do.
 
 ```shell
-pip install --editable .[dev]
-```
-
-```shell
-pip install --editable .[gcloud]
-```
-
-```shell
-pip install --editable .[publishing]
-```
-
-```shell
-pip install --editable .[testing]
+uv pip install --editable .[dev]       # isort, ruff, prospector, pyroma, pre-commit
+uv pip install --editable .[gcloud]    # flask (for Google Cloud Function deployment)
+uv pip install --editable .[publishing] # twine, wheel
+uv pip install --editable .[testing]   # pytest, pytest-cov
 ```
 
 You can combine these into one command like so, e.g.:
 
 ```shell
-pip install --editable .[dev,testing]
+uv pip install --editable .[dev,testing]
+```
+
+Alternatively, you can use the Makefile targets:
+
+```shell
+make dev-install    # install with dev + testing deps (editable)
+make install        # install runtime deps only
 ```
 
 ## Testing
 
 ```shell
 # (from the project root)
-pip install --editable .[testing]
+uv pip install --editable .[testing]
 
 # run all tests
 pytest tests/
@@ -60,6 +50,14 @@ pytest tests/test_consistent_versioning.py
 
 # run pytest on a subset of the files, e.g.
 cd tests/lib/cff_1_2_0/ && pytest .
+```
+
+Alternatively, use the Makefile:
+
+```shell
+make test            # run full test suite
+make test-version    # run version-consistency checks
+make test-marker M=bibtex  # run tests for a specific marker
 ```
 
 Tests pertaining to a specific exporter have been marked accordingly with one of the following markers (see also
@@ -99,7 +97,7 @@ pytest -m 'schemaorg or codemeta'
 Running the linters requires that the development tools have been installed:
 
 ```shell
-pip install --editable .[dev]
+uv pip install --editable .[dev]
 ```
 
 Sorting Python import lines with '`isort`' (https://pycqa.github.io/isort/):
@@ -151,6 +149,13 @@ follows:
  
 ```shell
 pre-commit install
+```
+
+Alternatively, you can run all linters via the Makefile:
+
+```shell
+make lint            # isort, ruff, prospector, pyroma
+make precommit       # pre-commit run --all-files
 ```
 
 ## Construction of author keys

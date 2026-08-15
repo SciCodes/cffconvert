@@ -1,3 +1,4 @@
+import json
 import pytest
 from click.testing import CliRunner
 from cffconvert.cli.cli import cli as cffconvert
@@ -86,3 +87,28 @@ def test_writing_to_file(fmt, fname, cffstr):
             actual = fid.read()
     assert result.exit_code == 0
     assert expected == actual
+
+
+@pytest.mark.cli
+def test_cff_1_3_metadata_end_to_end():
+    cffstr = """authors:
+  - name: Test organization
+    ror: https://ror.org/04bwf3e34
+cff-version: 1.3.0
+contributors:
+  - given-names: Ada
+    family-names: Lovelace
+license-url: https://example.org/license
+message: Cite this work
+title: Test title
+"""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("CITATION.cff", "wt", encoding="utf-8") as fid:
+            fid.write(cffstr)
+        result = runner.invoke(cffconvert, ["-f", "schema.org"])
+    assert result.exit_code == 0
+    output = json.loads(result.output)
+    assert output["author"][0]["@id"] == "https://ror.org/04bwf3e34"
+    assert output["contributor"][0]["familyName"] == "Lovelace"
+    assert output["license"] == "https://example.org/license"

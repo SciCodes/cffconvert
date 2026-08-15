@@ -24,20 +24,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: pyproject.toml
+
       - name: Show python info
         run: |
           which python3
           python3 --version
 
-      - name: Upgrade pip, setuptools and wheel
-        run: |
-          python3 -m pip install --upgrade pip setuptools wheel
-
-      - name: Install cffconvert with its runtime dependencies
-        run: python3 -m pip install .
-
       - name: Install cffconvert with its testing dependencies
-        run: python3 -m pip install .[testing]
+        run: uv pip install --system --editable .[testing]
 
       - name: Run tests
-        run: python3 -m pytest tests/
+        run: uv run --system pytest tests/

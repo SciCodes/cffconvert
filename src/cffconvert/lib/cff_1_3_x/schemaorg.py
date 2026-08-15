@@ -20,14 +20,23 @@ class SchemaorgObject(Shared):
             self.check_cffobj()
             self.add_all()
 
+    @staticmethod
+    def _as_schemaorg_author(author):
+        converted = SchemaorgAuthor(author).as_dict()
+        if converted is not None and author.get("ror") is not None:
+            if converted.get("@id") is not None:
+                converted["identifier"] = converted["@id"]
+            converted["@id"] = author["ror"]
+        return converted
+
     def add_author(self):
         authors_cff = self.cffobj.get("authors", [])
-        authors_schemaorg = [SchemaorgAuthor(a).as_dict() for a in authors_cff]
+        authors_schemaorg = [self._as_schemaorg_author(a) for a in authors_cff]
         self.author = [a for a in authors_schemaorg if a is not None]
         return self
 
     def add_contributor(self):
-        contributors = [SchemaorgAuthor(c).as_dict() for c in self.cffobj.get("contributors", [])]
+        contributors = [self._as_schemaorg_author(c) for c in self.cffobj.get("contributors", [])]
         contributors = [c for c in contributors if c is not None]
         if len(contributors) > 0:
             self.contributor = contributors
@@ -47,6 +56,21 @@ class SchemaorgObject(Shared):
                 if identifier["type"] == "doi":
                     self.identifier = f"https://doi.org/{identifier['value']}"
                     break
+        return self
+
+    def add_license(self):
+        licenses = []
+        license_value = self.cffobj.get("license")
+        if isinstance(license_value, list):
+            licenses.extend(f"https://spdx.org/licenses/{item}" for item in license_value)
+        elif license_value is not None:
+            licenses.append(f"https://spdx.org/licenses/{license_value}")
+        if "license-url" in self.cffobj:
+            licenses.append(self.cffobj["license-url"])
+        if len(licenses) == 1:
+            self.license = licenses[0]
+        elif len(licenses) > 1:
+            self.license = licenses
         return self
 
     def add_type(self):
