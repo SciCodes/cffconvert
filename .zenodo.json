@@ -83,12 +83,7 @@
       "scheme": "doi"
     },
     {
-      "identifier": "https://github.com/citation-file-format/cffconvert",
-      "relation": "isSupplementedBy",
-      "scheme": "url"
-    },
-    {
-      "identifier": "https://pypi.org/project/cffconvert",
+      "identifier": "https://github.com/SciCodes/cffconvert",
       "relation": "isSupplementedBy",
       "scheme": "url"
     }

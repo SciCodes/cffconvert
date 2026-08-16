@@ -31,6 +31,7 @@ CMD ["pytest", "tests/"]
 FROM python:3.12-slim AS runtime
 
 LABEL org.opencontainers.image.version="3.0.0a0"
+LABEL org.opencontainers.image.source="https://github.com/scicodes/cffconvert"
 
 # Copy the pre-built venv from the builder stage
 COPY --from=builder /app/.venv /app/.venv

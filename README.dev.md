@@ -19,7 +19,6 @@ There are various sets of dependencies that you may want to install depending on
 ```shell
 uv pip install --editable .[dev]       # isort, ruff, prospector, pyroma, pre-commit
 uv pip install --editable .[gcloud]    # flask (for Google Cloud Function deployment)
-uv pip install --editable .[publishing] # twine, wheel
 uv pip install --editable .[testing]   # pytest, pytest-cov
 ```
 
@@ -35,6 +34,12 @@ Alternatively, you can use the Makefile targets:
 make dev-install    # install with dev + testing deps (editable)
 make install        # install runtime deps only
 ```
+
+## Interim distribution
+
+The official interim source distribution is the Git tag attached to a published GitHub Release.
+The first planned concrete example is `v2026.08`.
+Publish a GitHub Release for that tag to trigger GHCR; use `main` only for development, not as a distribution source.
 
 ## Testing
 
@@ -385,9 +390,8 @@ The table below lists how the key name is constructed based what information was
 
 ### Making a release
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full release procedure, including
-TestPyPI dry runs, production releases via GitHub Releases and PyPI Trusted
-Publishing, and the release checklist.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full tag-and-push procedure,
+version checks, GHCR preparation, and the release checklist.
 
 ### Building the docker image
 
@@ -422,4 +426,23 @@ docker tag cffconvert:latest citationcff/cffconvert:latest
 # publish
 docker push citationcff/cffconvert:3.0.0a0
 docker push citationcff/cffconvert:latest
+```
+
+### Publishing on GHCR
+
+Publishing a GitHub Release for the release tag triggers the `publish-to-ghcr.yml` workflow, which publishes
+`ghcr.io/scicodes/cffconvert:<release-tag>` and uses the `ghcr` environment as a deployment gate.
+For the first planned example release, the tag is `v2026.08`.
+No secrets are needed for that environment.
+Replace `<release-tag>` with the published GitHub Release tag in the commands below.
+
+Before the first publish, configure the `ghcr` environment in GitHub and check the
+package settings after upload so the package is linked to `SciCodes/cffconvert` and public.
+
+The image will only exist after a successful workflow run, so use a local smoke test first:
+
+```shell
+docker build --tag ghcr.io/scicodes/cffconvert:<release-tag> .
+docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --version
+docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --help
 ```

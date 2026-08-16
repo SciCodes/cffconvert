@@ -4,7 +4,7 @@
 .PHONY: install dev-install test test-version test-marker \
         test-local test-version-local test-marker-local \
         lint precommit clean \
-        build check-dist release-check publish-test help \
+        build release-check help \
         docker-build docker-run docker-smoke docker-test-build
 
 # Default Python interpreter (use venv python if available, else system python3)
@@ -83,16 +83,8 @@ docker-smoke: docker-build
 build: clean
 	$(PYTHON) -m build
 
-## Check distributions with twine
-check-dist:
-	$(PYTHON) -m twine check dist/*
-
 ## Run the full local release validation gate (never publishes)
-release-check: clean lint test test-version build check-dist
-
-## Publish to TestPyPI (optional, requires TestPyPI credentials in ~/.pypirc)
-publish-test: check-dist
-	$(PYTHON) -m twine upload --repository testpypi dist/*
+release-check: clean lint test test-version build
 
 ## Show available targets
 help:

@@ -54,11 +54,8 @@ identifiers:
     description: Persistent identifier for this version of cffconvert
     relation: isIdenticalTo
   - type: url
-    value: https://github.com/citation-file-format/cffconvert
+    value: https://github.com/SciCodes/cffconvert
     description: URL to the GitHub repository for cffconvert
-  - type: url
-    value: https://pypi.org/project/cffconvert
-    description: cffconvert on PyPI
 keywords:
   - bibliography
   - BibTeX
@@ -71,8 +68,7 @@ keywords:
   - Citation File Format
 license: Apache-2.0
 message: If you use this software, please cite it using these metadata.
-repository-artifact: https://pypi.org/project/cffconvert
-repository-code: https://github.com/citation-file-format/cffconvert
+repository-code: https://github.com/SciCodes/cffconvert
 title: cffconvert
 type: software
 version: 3.0.0a0

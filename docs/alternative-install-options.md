@@ -2,6 +2,11 @@
 
 ## Install in virtual environment
 
+The official interim source distribution is the Git tag attached to a published GitHub Release.
+The first planned concrete example is `v2026.08`. `main` is development-only, and PyPI is not the distribution channel
+for this fork.
+Replace `<release-tag>` with the published GitHub Release tag in the commands below.
+
 ```shell
 # use venv to make a virtual environment named venv
 python3 -m venv venv
@@ -9,8 +14,8 @@ python3 -m venv venv
 # activate the environment
 source venv/bin/activate
 
-# install cffconvert from GitHub
-pip install git+https://github.com/scicodes/cffconvert.git
+# install cffconvert from the published release tag
+pip install git+https://github.com/scicodes/cffconvert.git@<release-tag>
 ```
 
 ## Install globally
@@ -18,7 +23,7 @@ pip install git+https://github.com/scicodes/cffconvert.git
 Note: this option needs sudo rights.
 
 ```shell
-sudo -H python3 -m pip install git+https://github.com/scicodes/cffconvert.git
+sudo -H python3 -m pip install git+https://github.com/scicodes/cffconvert.git@<release-tag>
 ```
 
 ## Install with conda
@@ -33,7 +38,7 @@ channels:
 dependencies:
   - pip
   - pip:
-    - git+https://github.com/scicodes/cffconvert.git
+    - git+https://github.com/scicodes/cffconvert.git@<release-tag>
 ```
 
 Then run:

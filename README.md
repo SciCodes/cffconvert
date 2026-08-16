@@ -4,14 +4,11 @@
 [![testing](https://github.com/citation-file-format/cffconvert/actions/workflows/testing.yml/badge.svg)](https://github.com/citation-file-format/cffconvert/actions/workflows/testing.yml)
 [![linting](https://github.com/citation-file-format/cffconvert/actions/workflows/linting.yml/badge.svg)](https://github.com/citation-file-format/cffconvert/actions/workflows/linting.yml)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cffconvert&metric=code_smells)](https://sonarcloud.io/dashboard?id=cffconvert)
-[![PyPI Badge](https://img.shields.io/pypi/v/cffconvert.svg?colorB=blue)](https://pypi.python.org/pypi/cffconvert/)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1811/badge)](https://bestpractices.coreinfrastructure.org/projects/1811)
 [![Research Software Directory](https://img.shields.io/badge/rsd-cffconvert-00a3e3.svg)](https://research-software.nl/software/cffconvert)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 [![FAIR checklist badge](https://fairsoftwarechecklist.net/badge.svg)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32100&r=113)
 [![Docker Pulls](https://img.shields.io/docker/pulls/citationcff/cffconvert)](https://hub.docker.com/r/citationcff/cffconvert)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/cffconvert)](https://pypistats.org/packages/cffconvert)
-[![PePy](https://static.pepy.tech/badge/cffconvert)](https://pepy.tech/project/cffconvert)
 [![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/citation-file-format/cffconvert/2.0.0)](https://github.com/citation-file-format/cffconvert/compare/2.0.0...HEAD)
 
 
@@ -45,11 +42,14 @@ CFF file specifies multiple licenses.
 
 ## Installing
 
-Install `cffconvert` directly from the SciCodes Git repository:
+Install the official interim source distribution from the Git tag attached to a published GitHub Release.
+The first planned concrete example is `v2026.08`.
 
 ```shell
-python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git
+python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git@<release-tag>
 ```
+Replace `<release-tag>` with the published GitHub Release tag, for example `v2026.08`.
+Untagged `main` is development-only. Do not use PyPI for this fork; the `cffconvert` package name is already in use there.
 Ensure that the user space directory `~/.local/bin/` is on the `PATH`.
 
 ```shell
@@ -63,7 +63,7 @@ To install a specific branch, tag, or commit:
 python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git@<ref>
 ```
 
-Replace `<ref>` with a branch name, tag, or commit SHA (e.g. `main`, `3.0.0`, or `054bda5`).
+Replace `<ref>` with a branch name, tag, or commit SHA. For the official interim source distribution, use the published release tag.
 
 For a local development install, clone the repository and install in editable mode:
 
@@ -77,14 +77,17 @@ See [docs/alternative-install-options.md](docs/alternative-install-options.md) f
 
 ## Docker
 
-`cffconvert` is available from DockerHub: https://hub.docker.com/r/citationcff/cffconvert
+`cffconvert` will be available on GHCR as `ghcr.io/scicodes/cffconvert:<release-tag>` after the GitHub Release for that tag is published.
+For the first planned example release, that tag is `v2026.08`.
+Replace `<release-tag>` with the published GitHub Release tag.
+Legacy Docker Hub images still exist at https://hub.docker.com/r/citationcff/cffconvert.
 
 Example usage:
 
 ```shell
-docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --validate
-docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --version
-docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --help
+docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --validate
+docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --version
+docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --help
 # etc
 ```
 

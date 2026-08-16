@@ -85,17 +85,16 @@ make precommit          # run all pre-commit hooks
 
 ### Packaging
 
-Build source and wheel distributions, then validate them:
+Build local source artifacts when needed:
 
 ```shell
 make clean        # remove stale build artifacts
 make build        # build sdist + wheel into dist/
-make check-dist   # twine check dist/*
 ```
 
 ### Release preparation
 
-Before publishing, update the version **everywhere** it must be synchronized.
+Before tagging, update the version **everywhere** it must be synchronized.
 The version is checked for consistency by `tests/test_consistent_versioning.py`
 across these files:
 
@@ -110,67 +109,58 @@ Update the version in all of the above, then run:
 
 ```shell
 make test-version   # verify version consistency
-make release-check  # full local validation gate (clean, lint, test, test-version, build, check-dist)
+make release-check  # full local validation gate (clean, lint, test, test-version, build)
 ```
 
 `make release-check` runs the complete local validation gate. It never publishes
-anything — it only verifies that the package is ready for release.
+anything — it only verifies that the package is ready for release. Do not upload
+this project to PyPI.
 
-### TestPyPI (optional dry run)
+### Interim tagged release procedure
 
-To verify the package installs cleanly from a real index before a production
-release, publish to TestPyPI:
-
-```shell
-make publish-test   # builds, checks, and uploads to TestPyPI
-```
-
-This requires a `~/.pypirc` entry for `testpypi` or `TWINE_USERNAME` /
-`TWINE_PASSWORD` environment variables pointing at a TestPyPI account.
-
-### Production release procedure
-
-Production releases are published to PyPI **exclusively** via GitHub Releases
-and PyPI Trusted Publishing. There is no `make publish` target for production.
+The official interim source distribution is the Git tag attached to a published
+GitHub Release. The first planned concrete example is `v2026.08`.
+Publishing a GitHub Release for that tag triggers the GHCR workflow.
 
 **Steps:**
 
 1. Ensure `main` is green (CI passes) and `make release-check` succeeds locally.
-2. Update `CHANGELOG.md` with the release notes for the new version.
-3. Commit and push all version changes to `main`.
-4. Create a **GitHub Release** on the `citation-file-format/cffconvert` repository:
-   - Tag name: the version string from `pyproject.toml` (e.g. `3.0.0`).
-   - Title: the version string (e.g. `3.0.0`).
-   - Description: paste the relevant `CHANGELOG.md` section.
-5. Publishing the GitHub Release triggers the
-   [`publish-to-pypi`](.github/workflows/publish-to-pypi.yml) workflow:
-   - Checks out the exact release tag.
-   - Verifies the tag matches `pyproject.toml` version.
-   - Builds sdist + wheel.
-   - Runs `twine check dist/*`.
-   - Uploads to PyPI using **Trusted Publishing** (OIDC, no API tokens).
-6. After PyPI publication succeeds, the existing
-   [`zenodraft`](.github/workflows/zenodraft.yml) workflow creates a Zenodo
-   deposit draft (triggered by the same release event).
+2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.08`).
+3. Update `CHANGELOG.md` with the release notes for the tag, if desired.
+4. Create an annotated exact tag:
 
-### PyPI Trusted Publishing configuration
+   ```shell
+   git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
+   git push origin "$RELEASE_TAG"
+   ```
 
-Trusted Publishing is configured on the PyPI side (no API tokens in GitHub
-Secrets). The GitHub Actions workflow uses `pypa/gh-action-pypi-publish@release/v1`
-with `permissions: id-token: write` and `environment: pypi`.
+5. Verify installation from the tag:
 
-**PyPI settings (configured once by a project admin):**
+   ```shell
+   python3 -m pip install --user "git+https://github.com/SciCodes/cffconvert.git@$RELEASE_TAG"
+   ```
 
-| Setting | Value |
-|---------|-------|
-| PyPI project | `cffconvert` |
-| Owner | `citation-file-format` (or `SciCodes`) |
-| Repository | `citation-file-format/cffconvert` |
-| Workflow filename | `publish-to-pypi.yml` |
-| Environment name | `pypi` |
+6. Publish a GitHub Release for `$RELEASE_TAG`; this triggers GHCR and publishes `ghcr.io/scicodes/cffconvert:$RELEASE_TAG`.
+7. Include any release notes or Zenodo metadata as needed.
+8. Confirm the `publish-to-ghcr` workflow completes successfully and the package is linked to `SciCodes/cffconvert` with
+   public visibility.
 
-See the [PyPI Trusted Publishing
-docs](https://docs.pypi.org/trusted-publishers/) for setup details.
+### GHCR preparation and publication
+
+Publishing a GitHub Release for the release tag triggers the GHCR workflow.
+
+1. Configure the `ghcr` environment in repository settings as a deployment gate; no secrets are needed.
+2. Run a local Docker smoke test:
+
+   ```shell
+   docker build --tag ghcr.io/scicodes/cffconvert:$RELEASE_TAG .
+   docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:$RELEASE_TAG --version
+   ```
+
+3. Publish a GitHub Release for `$RELEASE_TAG` to trigger
+   [`publish-to-ghcr.yml`](.github/workflows/publish-to-ghcr.yml).
+4. Confirm the workflow completes successfully.
+5. After the first publish, link the package to `SciCodes/cffconvert` and set package visibility to public if needed.
 
 ### Release checklist
 
@@ -179,9 +169,16 @@ docs](https://docs.pypi.org/trusted-publishers/) for setup details.
 - [ ] `make test-version` passes (version consistency)
 - [ ] `make release-check` passes (full local gate)
 - [ ] CI green on `main`
-- [ ] GitHub Release created with tag matching `pyproject.toml` version
-- [ ] `publish-to-pypi` workflow completed successfully
-- [ ] `zenodraft` workflow completed (Zenodo deposit created)
-- [ ] PyPI page shows new version: <https://pypi.org/project/cffconvert/>
-- [ ] (Optional) Docker image built and pushed to DockerHub
+- [ ] `RELEASE_TAG` set to the intended published release tag
+- [ ] Annotated exact tag created and pushed from `$RELEASE_TAG`
+- [ ] Installation from the tagged Git URL `git+https://github.com/SciCodes/cffconvert.git@$RELEASE_TAG` verified
+- [ ] GitHub Release published for `$RELEASE_TAG`
+- [ ] Optional release notes / Zenodo metadata included as needed
 
+### GHCR checklist
+
+- [ ] `ghcr` environment configured in repository settings
+- [ ] Local Docker smoke test passes for `ghcr.io/scicodes/cffconvert:$RELEASE_TAG`
+- [ ] GitHub Release for `$RELEASE_TAG` published to trigger `publish-to-ghcr.yml`
+- [ ] `publish-to-ghcr` workflow completed successfully
+- [ ] GitHub Packages repository linkage checked and package visibility set to public

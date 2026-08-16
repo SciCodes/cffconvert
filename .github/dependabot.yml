@@ -31,8 +31,6 @@ updates:
           - "pyroma"
           - "ruff"
           - "setuptools"
-          - "twine"
-          - "wheel"
           - "pytest"
           - "pytest-cov"
 
