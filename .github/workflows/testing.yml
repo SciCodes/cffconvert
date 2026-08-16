@@ -36,7 +36,7 @@ jobs:
           python3 --version
 
       - name: Install cffconvert with its testing dependencies
-        run: uv pip install --system --editable .[testing]
+        run: uv pip install --system --editable ".[testing]"
 
       - name: Run tests
-        run: uv run --system pytest tests/
+        run: python -m pytest tests/

@@ -48,11 +48,11 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.1162057
     description: Persistent identifier for all versions of cffconvert
-    relation: isPartOf
+    relation: IsPartOf
   - type: doi
     value: 10.5281/zenodo.5521767
     description: Persistent identifier for this version of cffconvert
-    relation: isIdenticalTo
+    relation: IsIdenticalTo
   - type: url
     value: https://github.com/SciCodes/cffconvert
     description: URL to the GitHub repository for cffconvert
