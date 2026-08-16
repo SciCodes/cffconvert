@@ -1,9 +1,9 @@
 # Contributing guidelines
 
 We welcome any kind of contribution to our software, from simple comment or
-question to a full fledged [pull
-request](https://help.github.com/articles/about-pull-requests/). However, we ask
-that you read and follow this organization's [Code of Conduct](https://github.com/citation-file-format/citation-file-format/blob/master/CODE_OF_CONDUCT.md).
+question to a full fledged [pull request](https://help.github.com/articles/about-pull-requests/). 
+However, we ask that you read and follow this organization's 
+[Code of Conduct](https://scicodes.net/policies/code-of-conduct/).
 
 A contribution can be one of the following cases:
 
@@ -29,8 +29,7 @@ The sections below outline the steps in each case.
    making sure to provide enough information to the rest of the community to
    understand the cause and context of the problem. Depending on the issue, you may
    want to include:
-    - the [SHA
-      hashcode](https://help.github.com/articles/autolinked-references-and-urls/#commit-shas)
+    - the [SHA hashcode](https://help.github.com/articles/autolinked-references-and-urls/#commit-shas)
       of the commit that is causing your problem;
     - some identifying information (name and version number) for dependencies you're
       using;
@@ -114,6 +113,10 @@ make release-check  # full local validation gate (clean, lint, test, test-versio
 `make release-check` runs the complete local validation gate. It never publishes
 anything — it only verifies that the package is ready for release. Do not upload
 this project to PyPI.
+
+## Commits
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
 
 ### Interim tagged release procedure
 

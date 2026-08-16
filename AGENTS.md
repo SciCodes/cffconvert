@@ -2,6 +2,10 @@
 
 `cffconvert` — Python CLI and library to validate and convert `CITATION.cff` files (CFF 1.0.1–1.3.0) to APA-like, BibTeX, CodeMeta, EndNote, RIS, schema.org JSON, and Zenodo JSON. Does not convert `references` or `preferred-citation` keys.
 
+## Commits
+
+- Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
+
 ## Setup
 
 ```shell
@@ -53,7 +57,7 @@ Pytest markers are registered in `pyproject.toml` — do not introduce unregiste
 ## Invariants and constraints
 
 - **Version sync**: the canonical package version is `2026.8`. It must match across `pyproject.toml`, `src/cffconvert/cli/version.py`, `CITATION.cff`, and `.zenodo.json`. The release tag (for the first planned release, `v2026.08`) is separate. Enforced by `tests/test_consistent_versioning.py`.
-- **Dockerfile**: multi-stage build with the same pinned Python image in both builder and runtime (uv installed via pip in the builder). Includes a `test` stage with testing dependencies for `make test`. The Dockerfile must not hard-code `org.opencontainers.image.version`; GHCR metadata supplies release image labels.
+- **Dockerfile**: multi-stage build using `python:3.12-alpine` in both builder and runtime (uv installed via pip in the builder). Includes a `test` stage with testing dependencies for `make test`. The Dockerfile must not hard-code `org.opencontainers.image.version`; GHCR metadata supplies release image labels.
 - **Style**: line length 120, double quotes, single-line imports, force-sorted within sections (`known_first_party = ["cffconvert"]`). Config in `pyproject.toml` (`[tool.ruff]`, `[tool.ruff.lint.isort]`, `[tool.ruff.lint.flake8-quotes]`).
 - **YAML parsing**: use `ruamel.yaml` with `typ="safe"`; timestamps must be loaded as strings (see `YAML_TIMESTAMP_TYPE` in `src/cffconvert/lib/constants.py` and each `citation.py`).
 - **Schema loading**: JSON schemas live in `src/cffconvert/schemas/<version>/schema.json`, loaded at runtime via `get_package_root()` from `src/cffconvert/root.py`.
