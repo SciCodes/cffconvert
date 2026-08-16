@@ -16,11 +16,11 @@ make dev-install        # install with dev + testing deps (editable)
 make test               # run full test suite (in Docker)
 make test-local         # run full test suite on the host (requires dev-install)
 make test-version       # run version-consistency checks (in Docker)
-make lint               # isort, ruff, prospector, pyroma
+make lint               # ruff, pyroma
 make precommit          # run all pre-commit hooks
 ```
 
-Requires Python ≥ 3.8. Source under `src/cffconvert/` (setuptools `find` from `src/`).
+Requires Python ≥ 3.10. Source under `src/cffconvert/` (setuptools `find` from `src/`).
 
 **Always run commands inside the Docker sandbox and prefer Makefile targets over raw commands.** Use `make docker-build` to build the production image, `make docker-run ARGS="…"` to execute `cffconvert` inside the container, and `make test` to run the full test suite in Docker (builds a test image with testing dependencies). Use `make test-local` to run tests on the host instead. For lint targets, run `make lint` or `uv pip install --system --editable .[dev,testing]` inside the sandbox — never run `uv run` or `make` targets directly on the host.
 
@@ -33,21 +33,35 @@ make test-version       # version-consistency checks in Docker
 make test-version-local # version-consistency checks on the host
 make test-marker M=bibtex   # by marker in Docker: apalike|bibtex|codemeta|endnote|ris|schemaorg|zenodo|cli|lib
 pytest -m bibtex        # by marker on the host
-make lint               # isort, ruff, prospector, pyroma
+make lint               # ruff, pyroma
 make precommit          # pre-commit run --all-files
 ```
+
+For changes under `.github/workflows/`, lint every workflow and exercise the changed commands rather than relying only
+on the project test suite:
+
+```shell
+docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest
+make docker-build && make docker-run ARGS="--validate"  # validate the root CITATION.cff with current source
+```
+
+Run changed CI commands in the relevant container or runner environment so unsupported CLI flags and shell differences
+fail before CI.
 
 Pytest markers are registered in `pyproject.toml` — do not introduce unregistered markers. Test fixtures live under `tests/cli/cff_<version>/` and `tests/lib/cff_<version>/`.
 
 ## Invariants and constraints
 
-- **Version sync**: the version string must match across `pyproject.toml`, `CITATION.cff`, `.zenodo.json`, and `Dockerfile`. Enforced by `tests/test_consistent_versioning.py`.
-- **Dockerfile**: multi-stage build with `python:3.12-slim` as both builder and runtime (uv installed via pip in the builder). Includes a `test` stage with testing dependencies for `make test`. The Dockerfile version is checked by `test_dockerfile` in `tests/test_consistent_versioning.py` via the `org.opencontainers.image.version` label.
-- **Style**: line length 120, double quotes, single-line imports, force-sorted within sections (`known_first_party = ["cffconvert"]`). Config in `pyproject.toml` (`[tool.isort]`, `[tool.ruff]`, `[tool.ruff.flake8-quotes]`).
+- **Version sync**: the canonical package version is `2026.8`. It must match across `pyproject.toml`, `src/cffconvert/cli/version.py`, `CITATION.cff`, and `.zenodo.json`. The release tag (for the first planned release, `v2026.08`) is separate. Enforced by `tests/test_consistent_versioning.py`.
+- **Dockerfile**: multi-stage build with the same pinned Python image in both builder and runtime (uv installed via pip in the builder). Includes a `test` stage with testing dependencies for `make test`. The Dockerfile must not hard-code `org.opencontainers.image.version`; GHCR metadata supplies release image labels.
+- **Style**: line length 120, double quotes, single-line imports, force-sorted within sections (`known_first_party = ["cffconvert"]`). Config in `pyproject.toml` (`[tool.ruff]`, `[tool.ruff.lint.isort]`, `[tool.ruff.lint.flake8-quotes]`).
 - **YAML parsing**: use `ruamel.yaml` with `typ="safe"`; timestamps must be loaded as strings (see `YAML_TIMESTAMP_TYPE` in `src/cffconvert/lib/constants.py` and each `citation.py`).
 - **Schema loading**: JSON schemas live in `src/cffconvert/schemas/<version>/schema.json`, loaded at runtime via `get_package_root()` from `src/cffconvert/root.py`.
 - **Validation backends**: `jsonschema` for CFF 1.2.0+, `pykwalify` for 1.0.x–1.1.0.
-- **Prospector**: ignores `src/cffconvert/gcloud/gcloud.py` (see `.prospector.yml`).
+- **Interim distribution**: install from the Git tag attached to a published GitHub Release. Do not publish this fork to
+  PyPI because the `cffconvert` package name is already in use there.
+- **Container releases**: publishing a GitHub Release triggers GHCR publication using that release's tag. Keep the
+  workflow version-agnostic; do not hard-code a release tag or publish an implicit `latest` tag.
 
 ## Change patterns
 
@@ -67,7 +81,7 @@ Pytest markers are registered in `pyproject.toml` — do not introduce unregiste
 
 ## Authoritative references
 
-- `pyproject.toml` — build, dependencies, isort, ruff, pytest config
+- `pyproject.toml` — build, dependencies, ruff, pytest config
 - `README.dev.md` — developer setup, testing, linting, author-key construction system
 - `CONTRIBUTING.md` — contribution workflow
 - `CHANGELOG.md` — version history

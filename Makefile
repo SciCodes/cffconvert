@@ -49,11 +49,9 @@ test-version-local:
 test-marker-local:
 	pytest -m $(M)
 
-## Run all linters (isort, ruff, prospector, pyroma)
+## Run all linters (ruff, pyroma)
 lint:
-	isort --check-only --diff src/cffconvert tests/
-	ruff check src/cffconvert
-	prospector --profile-path .prospector.yml
+	ruff check src/cffconvert tests
 	pyroma .
 
 ## Run pre-commit hooks on all files

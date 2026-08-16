@@ -22,12 +22,53 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
 
+      - name: Build the test image
+        run: docker build --target test --tag cffconvert-test .
+
+      - name: Run the test image
+        run: docker run --rm cffconvert-test
+
+      - name: Verify release tag matches installed package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          docker run --rm -i -e RELEASE_TAG="$RELEASE_TAG" cffconvert-test python - <<'PY'
+          import os
+          from importlib.metadata import version as metadata_version
+
+          release_tag = os.environ["RELEASE_TAG"]
+
+          def normalize_version(value: str) -> str:
+              normalized = value[1:] if value.startswith("v") else value
+              parts = normalized.split(".")
+              if not parts or any(part == "" for part in parts):
+                  raise SystemExit(
+                      f"Release tag {release_tag!r} is not a valid dotted version after removing a leading 'v'."
+                  )
+
+              try:
+                  return ".".join(str(int(part)) for part in parts)
+              except ValueError as exc:
+                  raise SystemExit(
+                      f"Release tag {release_tag!r} is not a valid dotted numeric version after removing a leading 'v'."
+                  ) from exc
+
+          normalized_release = normalize_version(release_tag)
+
+          installed_version = metadata_version("cffconvert")
+          if normalized_release != installed_version:
+              raise SystemExit(
+                  f"Release tag {release_tag!r} normalizes to {normalized_release!r}, "
+                  f"but installed package metadata version is {installed_version!r}."
+              )
+          PY
+
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -35,7 +76,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/scicodes/cffconvert
           tags: |
@@ -43,7 +84,7 @@ jobs:
 
       - name: Build and push image
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           push: true
@@ -51,7 +92,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Attest image provenance
-        uses: actions/attest@v4
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           subject-name: ghcr.io/scicodes/cffconvert
           subject-digest: ${{ steps.build.outputs.digest }}

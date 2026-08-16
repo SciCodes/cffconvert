@@ -1,6 +1,6 @@
 import json
-import pytest
 from jsonschema.exceptions import ValidationError
+import pytest
 from cffconvert import Citation
 
 

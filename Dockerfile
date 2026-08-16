@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
 
 # ---- build stage ----
-# Uses python:3.12-slim for both builder and runtime so the venv's
-# Python symlink resolves identically in both stages.
-FROM python:3.12-slim AS builder
+# Uses the same pinned Python image in both stages so the venv's
+# Python symlink resolves identically.
+FROM python:3.12.14-alpine3.24@sha256:d09d15e60962ca365d1cd544a48773bac9d33f2fb1b00f2aa0deec78ade7dc31 AS builder
 
-RUN pip install uv
+RUN pip install uv==0.12.5
 
 WORKDIR /app
 
@@ -28,9 +28,8 @@ WORKDIR /app
 CMD ["pytest", "tests/"]
 
 # ---- runtime stage ----
-FROM python:3.12-slim AS runtime
+FROM python:3.12.14-alpine3.24@sha256:d09d15e60962ca365d1cd544a48773bac9d33f2fb1b00f2aa0deec78ade7dc31 AS runtime
 
-LABEL org.opencontainers.image.version="3.0.0a0"
 LABEL org.opencontainers.image.source="https://github.com/scicodes/cffconvert"
 
 # Copy the pre-built venv from the builder stage

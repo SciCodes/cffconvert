@@ -17,14 +17,14 @@ The sections below outline the steps in each case.
 ## You have a question
 
 1. use the search functionality
-   [here](https://github.com/citation-file-format/cffconvert/issues) to see if someone already filed the same issue;
+   [here](https://github.com/SciCodes/cffconvert/issues) to see if someone already filed the same issue;
 2. if your issue search did not yield any relevant results, make a new issue;
 3. apply the "Question" label; apply other labels when relevant.
 
 ## You think you may have found a bug
 
 1. use the search functionality
-   [here](https://github.com/citation-file-format/cffconvert/issues) to see if someone already filed the same issue;
+   [here](https://github.com/SciCodes/cffconvert/issues) to see if someone already filed the same issue;
 2. if your issue search did not yield any relevant results, make a new issue,
    making sure to provide enough information to the rest of the community to
    understand the cause and context of the problem. Depending on the issue, you may
@@ -79,7 +79,7 @@ make test               # run the full test suite (in Docker)
 make test-local         # run the full test suite (locally, requires dev-install)
 make test-version       # run version-consistency checks (in Docker)
 make test-version-local # run version-consistency checks (locally)
-make lint               # run isort, ruff, prospector, pyroma
+make lint               # run ruff, pyroma
 make precommit          # run all pre-commit hooks
 ```
 
@@ -94,16 +94,15 @@ make build        # build sdist + wheel into dist/
 
 ### Release preparation
 
-Before tagging, update the version **everywhere** it must be synchronized.
+Before tagging, update the canonical package version **everywhere** it must be synchronized.
+The package version is `2026.8`; the published release tag is separate (for the first planned release, `v2026.08`).
 The version is checked for consistency by `tests/test_consistent_versioning.py`
 across these files:
 
-1. `pyproject.toml` — `version = "X.Y.Z"`
-2. `CITATION.cff` — `version: X.Y.Z`
-3. `.zenodo.json` — `"version": "X.Y.Z"`
-4. `Dockerfile` — `LABEL org.opencontainers.image.version="X.Y.Z"`
-5. `docs/alternative-install-options.md` — `docker build --tag cffconvert:X.Y.Z .`
-6. `README.dev.md` — multiple patterns (requires line, docker tag, docker push)
+1. `pyproject.toml` — `version = "2026.8"`
+2. `src/cffconvert/cli/version.py` — derives `__version__` from installed metadata
+3. `CITATION.cff` — `version: 2026.8`
+4. `.zenodo.json` — `"version": "2026.8"`
 
 Update the version in all of the above, then run:
 
@@ -125,7 +124,7 @@ Publishing a GitHub Release for that tag triggers the GHCR workflow.
 **Steps:**
 
 1. Ensure `main` is green (CI passes) and `make release-check` succeeds locally.
-2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.08`).
+2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.08`). The canonical package version remains `2026.8`.
 3. Update `CHANGELOG.md` with the release notes for the tag, if desired.
 4. Create an annotated exact tag:
 
@@ -164,7 +163,7 @@ Publishing a GitHub Release for the release tag triggers the GHCR workflow.
 
 ### Release checklist
 
-- [ ] All version files updated (`pyproject.toml`, `CITATION.cff`, `.zenodo.json`, `Dockerfile`, `docs/alternative-install-options.md`, `README.dev.md`)
+- [ ] All version files updated (`pyproject.toml`, `src/cffconvert/cli/version.py`, `CITATION.cff`, `.zenodo.json`)
 - [ ] `CHANGELOG.md` updated with release notes
 - [ ] `make test-version` passes (version consistency)
 - [ ] `make release-check` passes (full local gate)

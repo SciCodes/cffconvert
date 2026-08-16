@@ -62,8 +62,10 @@ arguments.
 On Google Cloud Function, set `requirements.txt` to:
 
 ```text
-cffconvert[gcloud]
+cffconvert[gcloud] @ git+https://github.com/SciCodes/cffconvert.git@<release-tag>
 ```
+
+Replace `<release-tag>` with a published GitHub Release tag, such as `v2026.08`.
 
 and use the following as `main.py`:
 
@@ -76,19 +78,18 @@ def main(request):
 
 ### Docker
 
-Build the Docker container 
+Build the Docker container
 
 ```shell
 cd <project root>
-docker build --tag cffconvert:3.0.0a0 .
-docker build --tag cffconvert:latest .
+docker build --tag cffconvert:<release-tag> .
 ```
 
-Run the Docker container 
+Run the Docker container
 
 ```shell
 cd <where your CITATION.cff is>
-docker run --rm -ti -v ${PWD}:/work -w /work cffconvert
+docker run --rm -ti -v "${PWD}":/work -w /work cffconvert:<release-tag>
 ```
 
 ### Platform-specific packages

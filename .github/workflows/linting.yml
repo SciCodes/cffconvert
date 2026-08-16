@@ -1,6 +1,6 @@
 name: linting
 
-on: 
+on:
   pull_request:
   push:
     branches:
@@ -17,15 +17,15 @@ jobs:
         os: ['ubuntu-latest']
         python-version: ['3.11']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v10.0.1
         with:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
@@ -36,23 +36,10 @@ jobs:
           python3 --version
 
       - name: Install development dependencies
-        run: uv pip install --system --editable .[dev,gcloud,testing]
-
-      - name: Check sorting of imports
-        # isort returns zero even when there are problems, explicitly check there is no output 
-        run: |
-          output=$(isort --check-only --diff src/cffconvert tests/)
-          if [[ -n "$output" ]]; then
-            exit 1
-          else
-            exit 0
-          fi
+        run: uv pip install --system --editable ".[dev,testing]"
 
       - name: Run ruff
-        run: ruff check src/cffconvert
-
-      - name: Run prospector
-        run: prospector --profile-path .prospector.yml
+        run: ruff check src/cffconvert tests
 
       - name: Run pyroma
         run: pyroma .

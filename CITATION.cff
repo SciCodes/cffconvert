@@ -43,16 +43,12 @@ contributors:
     given-names: Stefan
     orcid: https://orcid.org/0000-0002-5821-2060
 cff-version: 1.3.0
-date-released: 2021-09-22
+date-released: 2026-08-16
 identifiers:
   - type: doi
     value: 10.5281/zenodo.1162057
     description: Persistent identifier for all versions of cffconvert
     relation: IsPartOf
-  - type: doi
-    value: 10.5281/zenodo.5521767
-    description: Persistent identifier for this version of cffconvert
-    relation: IsIdenticalTo
   - type: url
     value: https://github.com/SciCodes/cffconvert
     description: URL to the GitHub repository for cffconvert
@@ -71,7 +67,7 @@ message: If you use this software, please cite it using these metadata.
 repository-code: https://github.com/SciCodes/cffconvert
 title: cffconvert
 type: software
-version: 3.0.0a0
+version: "2026.8"
 references:
   - authors:
       - affiliation: Netherlands eScience Center

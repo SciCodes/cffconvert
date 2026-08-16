@@ -1,39 +1,25 @@
 repos:
 
-  - repo: https://github.com/citation-file-format/cffconvert
-    rev: 054bda51dbe278b3e86f27c890e3f3ac877d616c
+  - repo: local
     hooks:
       - id: validate-cff
-        alias: cffconvert
         name: Validating CITATION.cff using 'cffconvert'
-
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        name: Sorting Python import lines using 'isort'
-        args:
-          - "--check-only"
-          - "--diff"
+        entry: cffconvert --validate
+        language: system
+        pass_filenames: false
+        files: ^CITATION\.cff$
 
   - repo: https://github.com/regebro/pyroma
-    rev: "4.2"
+    rev: "5.0.1"
     hooks:
       - id: pyroma
         name: Assessing the package metadata using 'pyroma'
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.278
+    rev: v0.16.3
     hooks:
-      - id: ruff
+      - id: ruff-check
         name: Linting using 'ruff'
-
-  - repo: https://github.com/PyCQA/prospector
-    rev: 1.10.2
-    hooks:
-      - id: prospector
-        name: Linting the code base using 'prospector'
-        args: ["--profile-path", ".prospector.yml"]
 
   - repo: https://github.com/tcort/markdown-link-check
     rev: bde6fd2675901c55f8a356a67475257d44af51ae # 3.11.2

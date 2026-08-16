@@ -1,98 +1,43 @@
+from importlib.metadata import version as metadata_version
 import json
-import os
+from pathlib import Path
 import re
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML  # type: ignore[import-not-found]
+from cffconvert.cli.version import __version__ as cli_version
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def get_version_from_pyproject_toml():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "pyproject.toml")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
+    file_contents = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     regex = re.compile(r'^version = "(?P<version>\S*)"$', re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    return actual_version
+    match = re.search(regex, file_contents)
+    assert match is not None
+    return match["version"]
+
+
+EXPECTED_VERSION = get_version_from_pyproject_toml()
 
 
 def test_citation_cff():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "CITATION.cff")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
+    file_contents = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     actual_version = YAML(typ="safe").load(file_contents)["version"]
-    assert actual_version == expected_version
+    assert actual_version == EXPECTED_VERSION
 
 
 def test_zenodo_json():
-    fixture = os.path.join(os.path.dirname(__file__), "..", ".zenodo.json")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
+    file_contents = (ROOT / ".zenodo.json").read_text(encoding="utf-8")
     actual_version = json.loads(file_contents)["version"]
-    assert actual_version == expected_version
+    assert actual_version == EXPECTED_VERSION
 
 
-def test_dockerfile():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "Dockerfile")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r'org.opencontainers.image.version="(?P<version>\S*)"', re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
+def test_cli_version_metadata():
+    installed_version = metadata_version("cffconvert")
+    assert installed_version == EXPECTED_VERSION
+    assert cli_version == installed_version
 
 
-def test_alternative_install_options_md():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "docs", "alternative-install-options.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"^docker build --tag cffconvert:(?P<version>\S*) .$", re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
-
-
-def test_readme_dev_md_1():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"^# \(builds from local source tree at version (?P<version>\S*)\)$", re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
-
-
-def test_readme_dev_md_2():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"^docker build --tag cffconvert:(?P<version>\S*) .$", re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
-
-
-def test_readme_dev_md_3():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"^docker tag cffconvert:(?P<version1>\S*) citationcff/" +
-                       r"cffconvert:(?P<version2>\S*)$", re.MULTILINE)
-    actual_version_1 = re.search(regex, file_contents)["version1"]
-    actual_version_2 = re.search(regex, file_contents)["version2"]
-    assert actual_version_1 == expected_version
-    assert actual_version_2 == expected_version
-
-
-def test_readme_dev_md_4():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"^docker push citationcff/cffconvert:(?P<version>\S*)$", re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
-
-
-def test_authors_keys_readme():
-    fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
-    with open(fixture, "rt", encoding="utf-8") as fid:
-        file_contents = fid.read()
-    regex = re.compile(r"blob/(?P<version>\S*)/cffconvert", re.MULTILINE)
-    actual_version = re.search(regex, file_contents)["version"]
-    assert actual_version == expected_version
-
-
-expected_version = get_version_from_pyproject_toml()
+def test_dockerfile_does_not_hard_code_version_label():
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    assert "org.opencontainers.image.version" not in dockerfile

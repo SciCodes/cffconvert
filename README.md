@@ -1,15 +1,14 @@
 # `cffconvert`
 
 [![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1162057.svg)](https://doi.org/10.5281/zenodo.1162057)
-[![testing](https://github.com/citation-file-format/cffconvert/actions/workflows/testing.yml/badge.svg)](https://github.com/citation-file-format/cffconvert/actions/workflows/testing.yml)
-[![linting](https://github.com/citation-file-format/cffconvert/actions/workflows/linting.yml/badge.svg)](https://github.com/citation-file-format/cffconvert/actions/workflows/linting.yml)
+[![testing](https://github.com/SciCodes/cffconvert/actions/workflows/testing.yml/badge.svg)](https://github.com/SciCodes/cffconvert/actions/workflows/testing.yml)
+[![linting](https://github.com/SciCodes/cffconvert/actions/workflows/linting.yml/badge.svg)](https://github.com/SciCodes/cffconvert/actions/workflows/linting.yml)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cffconvert&metric=code_smells)](https://sonarcloud.io/dashboard?id=cffconvert)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1811/badge)](https://bestpractices.coreinfrastructure.org/projects/1811)
 [![Research Software Directory](https://img.shields.io/badge/rsd-cffconvert-00a3e3.svg)](https://research-software.nl/software/cffconvert)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 [![FAIR checklist badge](https://fairsoftwarechecklist.net/badge.svg)](https://fairsoftwarechecklist.net/v0.2?f=31&a=32113&i=32100&r=113)
 [![Docker Pulls](https://img.shields.io/docker/pulls/citationcff/cffconvert)](https://hub.docker.com/r/citationcff/cffconvert)
-[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/citation-file-format/cffconvert/2.0.0)](https://github.com/citation-file-format/cffconvert/compare/2.0.0...HEAD)
 
 
 Command line program to validate and convert [`CITATION.cff`](https://github.com/citation-file-format/citation-file-format) files.
@@ -98,8 +97,8 @@ docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-ta
 
 ```yaml
 repos:
-  - repo: https://github.com/citation-file-format/cffconvert
-    rev: 054bda51dbe278b3e86f27c890e3f3ac877d616c
+  - repo: https://github.com/SciCodes/cffconvert
+    rev: v2026.08
     hooks:
       - id: validate-cff
 ```
@@ -137,7 +136,7 @@ Options:
   --verbose                       Control output verbosity.
 
   If this program is useful to you, consider giving it a star on GitHub:
-  https://github.com/citation-file-format/cffconvert
+  https://github.com/SciCodes/cffconvert
 ```
 
 ## Example usage

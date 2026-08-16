@@ -1,7 +1,7 @@
 import os
 from pykwalify.core import Core
-from ruamel.yaml import SafeConstructor
 from ruamel.yaml import YAML
+from ruamel.yaml import SafeConstructor
 from cffconvert.lib.cff_1_1_x.apalike import ApalikeObject
 from cffconvert.lib.cff_1_1_x.bibtex import BibtexObject
 from cffconvert.lib.cff_1_1_x.codemeta import CodemetaObject

@@ -17,7 +17,7 @@ uv pip install --editable .[dev,testing]
 There are various sets of dependencies that you may want to install depending on the work you're planning to do.
 
 ```shell
-uv pip install --editable .[dev]       # isort, ruff, prospector, pyroma, pre-commit
+uv pip install --editable .[dev]       # build, pre-commit, pyroma, ruff, setuptools
 uv pip install --editable .[gcloud]    # flask (for Google Cloud Function deployment)
 uv pip install --editable .[testing]   # pytest, pytest-cov
 ```
@@ -107,25 +107,10 @@ Running the linters requires that the development tools have been installed:
 uv pip install --editable .[dev]
 ```
 
-Sorting Python import lines with '`isort`' (https://pycqa.github.io/isort/):
+Linting the code base using `ruff`:
 
 ```shell
-# recursively check import style for the cffconvert module only
-isort --check-only src/cffconvert
-
-# recursively check import style for the cffconvert module only and show
-# any proposed changes as a diff
-isort --check-only --diff src/cffconvert
-
-# recursively fix import style for the cffconvert module only
-isort src/cffconvert
-```
-
-Linting the code base by running a variety of other tools via '`prospector`' (https://github.com/landscapeio/prospector):
-
-```shell
-# linter
-prospector
+ruff check src/cffconvert tests
 ```
 
 Assessing the package metadata using '`pyroma`' (https://github.com/regebro/pyroma):
@@ -133,12 +118,6 @@ Assessing the package metadata using '`pyroma`' (https://github.com/regebro/pyro
 ```shell
 # from the project root
 pyroma .
-```
-
-Linting the code base using '`ruff`' (https://github.com/astral-sh/ruff):
-
-```shell
-ruff check path/to/code/
 ```
 
 The linting tools are also usable via [`pre-commit`](https://pre-commit.com/):
@@ -161,7 +140,7 @@ pre-commit install
 Alternatively, you can run all linters via the Makefile:
 
 ```shell
-make lint            # isort, ruff, prospector, pyroma
+make lint            # ruff, pyroma
 make precommit       # pre-commit run --all-files
 ```
 
@@ -170,7 +149,7 @@ make precommit       # pre-commit run --all-files
 There are various source keys in CFF that can be used to convert to a target format. The code uses a pattern of first
 identifiying what information is present, then summarizing this as a key, then using that key to retrieve a method which 
 is tailored only to that specific combination of source keys. As an example of this mapping, see the setup in
-https://github.com/citation-file-format/cffconvert/blob/3.0.0a0/cffconvert/behavior_shared/schemaorg_author_shared.py
+https://github.com/SciCodes/cffconvert/blob/main/src/cffconvert/lib/cff_1_x_x/authors/base.py
 
 Source keys:
 
@@ -396,36 +375,15 @@ version checks, GHCR preparation, and the release checklist.
 ### Building the docker image
 
 ```shell
-# (builds from local source tree at version 3.0.0a0)
-docker build --tag cffconvert:3.0.0a0 .
-docker build --tag cffconvert:latest .
+# (builds from local source tree at version v2026.08)
+docker build --tag cffconvert:v2026.08 .
 ```
 
 See if the Docker image works as expected:
 ```shell
-docker run --rm -v $PWD:/work -w /work cffconvert --version
-docker run --rm -v $PWD:/work -w /work cffconvert
+docker run --rm -v "$PWD":/work -w /work cffconvert:v2026.08 --version
+docker run --rm -v "$PWD":/work -w /work cffconvert:v2026.08
 # etc
-```
-
-### Publishing on DockerHub
-
-See <https://docs.docker.com/docker-hub/repos/#pushing-a-docker-container-image-to-docker-hub> for more information on publishing.
-
-```shell
-# log out of any dockerhub credentials
-docker logout
-
-# log back in with username 'citationcff' credentials
-docker login
-
-# re-tag existing images
-docker tag cffconvert:3.0.0a0 citationcff/cffconvert:3.0.0a0
-docker tag cffconvert:latest citationcff/cffconvert:latest
-
-# publish
-docker push citationcff/cffconvert:3.0.0a0
-docker push citationcff/cffconvert:latest
 ```
 
 ### Publishing on GHCR

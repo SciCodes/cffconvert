@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out a copy of the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
 
       - name: Build the current cffconvert image
         run: docker build --tag cffconvert .

@@ -1,6 +1,6 @@
 import json
-import pytest
 from click.testing import CliRunner
+import pytest
 from cffconvert.cli.cli import cli as cffconvert
 from tests.cli.helpers import get_formats
 from tests.cli.helpers import read_sibling_file
@@ -28,15 +28,6 @@ def test_printing_of_help():
         result = runner.invoke(cffconvert, ["--help"])
     assert result.exit_code == 0
     assert result.output.startswith("Usage:")
-
-
-@pytest.mark.cli
-def test_printing_of_version():
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        result = runner.invoke(cffconvert, ["--version"])
-    assert result.exit_code == 0
-    assert result.output == "3.0.0a0\n"
 
 
 @pytest.mark.cli

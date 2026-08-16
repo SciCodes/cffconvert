@@ -66,7 +66,7 @@ options = {
     }
 }
 epilog = """If this program is useful to you, consider giving it a star on GitHub:
-https://github.com/citation-file-format/cffconvert"""
+https://github.com/SciCodes/cffconvert"""
 
 
 @click.command(epilog=epilog)

@@ -24,10 +24,7 @@ updates:
       pip-dev:
         patterns:
           - "build"
-          - "isort"
           - "pre-commit"
-          - "prospector"
-          - "pylint"
           - "pyroma"
           - "ruff"
           - "setuptools"

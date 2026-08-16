@@ -1,5 +1,5 @@
-import os
 from functools import lru_cache
+import os
 import pytest
 from cffconvert import Citation
 from cffconvert.lib.cff_1_3_x.apalike import ApalikeObject
