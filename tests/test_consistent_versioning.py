@@ -33,7 +33,7 @@ def test_dockerfile():
     fixture = os.path.join(os.path.dirname(__file__), "..", "Dockerfile")
     with open(fixture, "rt", encoding="utf-8") as fid:
         file_contents = fid.read()
-    regex = re.compile(r"^RUN .* cffconvert==(?P<version>\S*)$", re.MULTILINE)
+    regex = re.compile(r'org.opencontainers.image.version="(?P<version>\S*)"', re.MULTILINE)
     actual_version = re.search(regex, file_contents)["version"]
     assert actual_version == expected_version
 
@@ -51,7 +51,7 @@ def test_readme_dev_md_1():
     fixture = os.path.join(os.path.dirname(__file__), "..", "README.dev.md")
     with open(fixture, "rt", encoding="utf-8") as fid:
         file_contents = fid.read()
-    regex = re.compile(r"^# \(requires (?P<version>\S*) to be downloadable from PyPI\)$", re.MULTILINE)
+    regex = re.compile(r"^# \(builds from local source tree at version (?P<version>\S*)\)$", re.MULTILINE)
     actual_version = re.search(regex, file_contents)["version"]
     assert actual_version == expected_version
 

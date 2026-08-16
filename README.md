@@ -45,10 +45,10 @@ CFF file specifies multiple licenses.
 
 ## Installing
 
-To install in user space, 
+Install `cffconvert` directly from the SciCodes Git repository:
 
 ```shell
-python3 -m pip install --user cffconvert
+python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git
 ```
 Ensure that the user space directory `~/.local/bin/` is on the `PATH`.
 
@@ -57,20 +57,10 @@ which cffconvert
 ```
 should now return the location of the program.
 
-See [docs/alternative-install-options.md](docs/alternative-install-options.md) for alternative install options.
-
-## Installing from source
-
-To install `cffconvert` directly from this Git repository:
+To install a specific branch, tag, or commit:
 
 ```shell
-python3 -m pip install --user git+https://github.com/citation-file-format/cffconvert.git
-```
-
-Or, to install a specific branch, tag, or commit:
-
-```shell
-python3 -m pip install --user git+https://github.com/citation-file-format/cffconvert.git@<ref>
+python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git@<ref>
 ```
 
 Replace `<ref>` with a branch name, tag, or commit SHA (e.g. `main`, `3.0.0`, or `054bda5`).
@@ -78,10 +68,12 @@ Replace `<ref>` with a branch name, tag, or commit SHA (e.g. `main`, `3.0.0`, or
 For a local development install, clone the repository and install in editable mode:
 
 ```shell
-git clone https://github.com/citation-file-format/cffconvert.git
+git clone https://github.com/scicodes/cffconvert.git
 cd cffconvert
 python3 -m pip install --user --editable .[dev,testing]
 ```
+
+See [docs/alternative-install-options.md](docs/alternative-install-options.md) for alternative install options.
 
 ## Docker
 
@@ -90,9 +82,9 @@ python3 -m pip install --user --editable .[dev,testing]
 Example usage:
 
 ```shell
-docker run --rm -v $PWD:/app citationcff/cffconvert --validate
-docker run --rm -v $PWD:/app citationcff/cffconvert --version
-docker run --rm -v $PWD:/app citationcff/cffconvert --help
+docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --validate
+docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --version
+docker run --rm -v $PWD:/work -w /work citationcff/cffconvert --help
 # etc
 ```
 

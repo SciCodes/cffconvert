@@ -74,11 +74,13 @@ uv pip install --editable .[dev,testing]
 Or use the Makefile:
 
 ```shell
-make dev-install    # install with dev + testing deps (editable)
-make test           # run the full test suite
-make test-version   # run version-consistency checks only
-make lint           # run isort, ruff, prospector, pyroma
-make precommit      # run all pre-commit hooks
+make dev-install        # install with dev + testing deps (editable)
+make test               # run the full test suite (in Docker)
+make test-local         # run the full test suite (locally, requires dev-install)
+make test-version       # run version-consistency checks (in Docker)
+make test-version-local # run version-consistency checks (locally)
+make lint               # run isort, ruff, prospector, pyroma
+make precommit          # run all pre-commit hooks
 ```
 
 ### Packaging
@@ -100,7 +102,7 @@ across these files:
 1. `pyproject.toml` — `version = "X.Y.Z"`
 2. `CITATION.cff` — `version: X.Y.Z`
 3. `.zenodo.json` — `"version": "X.Y.Z"`
-4. `Dockerfile` — `cffconvert==X.Y.Z` (single `RUN` line)
+4. `Dockerfile` — `LABEL org.opencontainers.image.version="X.Y.Z"`
 5. `docs/alternative-install-options.md` — `docker build --tag cffconvert:X.Y.Z .`
 6. `README.dev.md` — multiple patterns (requires line, docker tag, docker push)
 

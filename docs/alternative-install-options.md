@@ -9,8 +9,8 @@ python3 -m venv venv
 # activate the environment
 source venv/bin/activate
 
-# install cffconvert in it
-pip install cffconvert
+# install cffconvert from GitHub
+pip install git+https://github.com/scicodes/cffconvert.git
 ```
 
 ## Install globally
@@ -18,7 +18,7 @@ pip install cffconvert
 Note: this option needs sudo rights.
 
 ```shell
-sudo -H python3 -m pip install cffconvert
+sudo -H python3 -m pip install git+https://github.com/scicodes/cffconvert.git
 ```
 
 ## Install with conda
@@ -33,13 +33,13 @@ channels:
 dependencies:
   - pip
   - pip:
-    - cffconvert
+    - git+https://github.com/scicodes/cffconvert.git
 ```
 
 Then run:
 
 ```shell
-conda venv create --file environment.yml
+conda env create --file environment.yml
 conda activate venv
 ```
 
@@ -83,7 +83,7 @@ Run the Docker container
 
 ```shell
 cd <where your CITATION.cff is>
-docker run --rm -ti -v ${PWD}:/app cffconvert
+docker run --rm -ti -v ${PWD}:/work -w /work cffconvert
 ```
 
 ### Platform-specific packages

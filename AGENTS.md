@@ -12,28 +12,29 @@ uv pip install --editable .[dev,testing]           # dev tooling + test deps
 Alternatively, use the Makefile targets:
 
 ```shell
-make dev-install    # install with dev + testing deps (editable)
-make test            # run full test suite
-make test-version    # run version-consistency checks
-make lint            # isort, ruff, prospector, pyroma
-make precommit       # run all pre-commit hooks
+make dev-install        # install with dev + testing deps (editable)
+make test               # run full test suite (in Docker)
+make test-local         # run full test suite on the host (requires dev-install)
+make test-version       # run version-consistency checks (in Docker)
+make lint               # isort, ruff, prospector, pyroma
+make precommit          # run all pre-commit hooks
 ```
 
 Requires Python ≥ 3.8. Source under `src/cffconvert/` (setuptools `find` from `src/`).
 
-**Always run commands inside the Docker sandbox and prefer Makefile targets over raw commands.** Use `make docker-build` to build the image and `make docker-run ARGS="…"` to execute `cffconvert` inside the container. For test and lint targets, run them within the container or via `uv pip install --system --editable .[dev,testing]` inside the sandbox — never run `uv run` or `make` targets directly on the host.
+**Always run commands inside the Docker sandbox and prefer Makefile targets over raw commands.** Use `make docker-build` to build the production image, `make docker-run ARGS="…"` to execute `cffconvert` inside the container, and `make test` to run the full test suite in Docker (builds a test image with testing dependencies). Use `make test-local` to run tests on the host instead. For lint targets, run `make lint` or `uv pip install --system --editable .[dev,testing]` inside the sandbox — never run `uv run` or `make` targets directly on the host.
 
 ## Validation commands
 
 ```shell
-pytest tests/                              # full suite (--maxfail=1, --strict-markers)
-pytest -m bibtex                           # by marker: apalike|bibtex|codemeta|endnote|ris|schemaorg|zenodo|cli|lib
-pytest tests/test_consistent_versioning.py # version-sync checks (run after any version bump)
-isort --check-only --diff src/cffconvert tests/
-ruff check src/cffconvert
-prospector --profile-path .prospector.yml
-pyroma .
-pre-commit run --all-files
+make test               # full suite in Docker (--maxfail=1, --strict-markers)
+make test-local         # full suite on the host (requires dev-install)
+make test-version       # version-consistency checks in Docker
+make test-version-local # version-consistency checks on the host
+make test-marker M=bibtex   # by marker in Docker: apalike|bibtex|codemeta|endnote|ris|schemaorg|zenodo|cli|lib
+pytest -m bibtex        # by marker on the host
+make lint               # isort, ruff, prospector, pyroma
+make precommit          # pre-commit run --all-files
 ```
 
 Pytest markers are registered in `pyproject.toml` — do not introduce unregistered markers. Test fixtures live under `tests/cli/cff_<version>/` and `tests/lib/cff_<version>/`.
@@ -41,7 +42,7 @@ Pytest markers are registered in `pyproject.toml` — do not introduce unregiste
 ## Invariants and constraints
 
 - **Version sync**: the version string must match across `pyproject.toml`, `CITATION.cff`, `.zenodo.json`, and `Dockerfile`. Enforced by `tests/test_consistent_versioning.py`.
-- **Dockerfile**: uses a multi-stage build with `ghcr.io/astral-sh/uv:debian` as the builder stage and `python:3.12-slim` as the runtime stage. The Dockerfile version is checked by `test_dockerfile` in `tests/test_consistent_versioning.py` via the regex `cffconvert==<version>`.
+- **Dockerfile**: multi-stage build with `python:3.12-slim` as both builder and runtime (uv installed via pip in the builder). Includes a `test` stage with testing dependencies for `make test`. The Dockerfile version is checked by `test_dockerfile` in `tests/test_consistent_versioning.py` via the `org.opencontainers.image.version` label.
 - **Style**: line length 120, double quotes, single-line imports, force-sorted within sections (`known_first_party = ["cffconvert"]`). Config in `pyproject.toml` (`[tool.isort]`, `[tool.ruff]`, `[tool.ruff.flake8-quotes]`).
 - **YAML parsing**: use `ruamel.yaml` with `typ="safe"`; timestamps must be loaded as strings (see `YAML_TIMESTAMP_TYPE` in `src/cffconvert/lib/constants.py` and each `citation.py`).
 - **Schema loading**: JSON schemas live in `src/cffconvert/schemas/<version>/schema.json`, loaded at runtime via `get_package_root()` from `src/cffconvert/root.py`.

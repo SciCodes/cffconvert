@@ -48,5 +48,11 @@ jobs:
             exit 0
           fi
 
+      - name: Run ruff
+        run: ruff check src/cffconvert
+
       - name: Run prospector
         run: prospector --profile-path .prospector.yml
+
+      - name: Run pyroma
+        run: pyroma .

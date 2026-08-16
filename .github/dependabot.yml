@@ -8,3 +8,35 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      pip-runtime:
+        patterns:
+          - "click"
+          - "requests"
+          - "ruamel.yaml"
+          - "pykwalify"
+          - "jsonschema"
+      pip-dev:
+        patterns:
+          - "build"
+          - "isort"
+          - "pre-commit"
+          - "prospector"
+          - "pylint"
+          - "pyroma"
+          - "ruff"
+          - "setuptools"
+          - "twine"
+          - "wheel"
+          - "pytest"
+          - "pytest-cov"
+
+  - package-ecosystem: "pre-commit"
+    directory: "/"
+    schedule:
+      interval: "monthly"

@@ -4,7 +4,7 @@
 
 ```shell
 # get a copy of the cffconvert software
-git clone https://github.com/citation-file-format/cffconvert.git
+git clone https://github.com/scicodes/cffconvert.git
 
 # change directory into cffconvert
 cd cffconvert
@@ -40,13 +40,14 @@ make install        # install runtime deps only
 
 ```shell
 # (from the project root)
-uv pip install --editable .[testing]
+# run all tests in Docker (builds a test image automatically)
+make test
 
-# run all tests
-pytest tests/
+# or run tests locally (requires dev-install)
+make test-local
 
 # run tests for consistent versioning
-pytest tests/test_consistent_versioning.py
+make test-version
 
 # run pytest on a subset of the files, e.g.
 cd tests/lib/cff_1_2_0/ && pytest .
@@ -55,9 +56,10 @@ cd tests/lib/cff_1_2_0/ && pytest .
 Alternatively, use the Makefile:
 
 ```shell
-make test            # run full test suite
-make test-version    # run version-consistency checks
-make test-marker M=bibtex  # run tests for a specific marker
+make test            # run full test suite (in Docker)
+make test-local      # run full test suite on the host (requires dev-install)
+make test-version    # run version-consistency checks (in Docker)
+make test-marker M=bibtex  # run tests for a specific marker (in Docker)
 ```
 
 Tests pertaining to a specific exporter have been marked accordingly with one of the following markers (see also
@@ -383,91 +385,22 @@ The table below lists how the key name is constructed based what information was
 
 ### Making a release
 
-
-1. make sure the release notes are up to date
-2. preparation
-
-    ```shell
-    # remove old cffconvert from your system if you have it
-    python3 -m pip uninstall cffconvert
-
-    # this next command should now return empty
-    which cffconvert
-
-    # install the package to user space, using no caching (can bring to light dependency problems)
-    python3 -m pip install --user --no-cache-dir .
-
-    # check if cffconvert works, e.g.
-    cffconvert --version
-    
-    # run the tests, make sure they pass
-    python3 -m pip pytest tests
-
-    # git push everything, merge into main as appropriate
-    ```
-    
-3. publishing on test instance of PyPI
-
-    ```shell
-    # verify that everything has been pushed and merged by testing as follows
-    cd $(mktemp -d --tmpdir cffconvert-release.XXXXXX)
-    git clone https://github.com/citation-file-format/cffconvert.git .
-    python3 -m venv venv
-    source venv/bin/activate
-    python3 -m pip install --upgrade pip wheel setuptools
-    python3 -m pip install --no-cache-dir .
-
-    # register with PyPI test instance https://test.pypi.org
-
-    # remove these directories if you have them
-    rm -rf dist
-    rm -rf cffconvert-egg.info
-    # make a source distribution:
-    python setup.py sdist
-    # make a wheel
-    python setup.py bdist_wheel 
-    # install the 'upload to pypi/testpypi tool' aka twine
-    pip install .[publishing]
-    # upload the contents of the source distribution we just made (requires credentials for test.pypi.org)
-    twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-    ```
-    
-4. Checking the package
-
-    Open another shell but keep the other one. We'll return to the first shell momentarily.
-    
-    Verify that there is a new version of the package on Test PyPI https://test.pypi.org/project/cffconvert/
-
-    ```shell
-    python3 -m pip -v install --user --no-cache-dir \
-    --index-url https://test.pypi.org/simple/ \
-    --extra-index-url https://pypi.org/simple cffconvert
-
-    # check that the package works as it should when installed from pypitest
-    ```
-5. FINAL STEP: upload to PyPI
-
-    Go back to the first shell, then (requires credentials for pypi.org)
-
-    ```shell
-    twine upload dist/*
-    ```
-6. Make the release on GitHub
-7. Go to Zenodo, log in to inspect the draft. Then click `Publish` to finalize it.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full release procedure, including
+TestPyPI dry runs, production releases via GitHub Releases and PyPI Trusted
+Publishing, and the release checklist.
 
 ### Building the docker image
 
 ```shell
-# (requires 3.0.0a0 to be downloadable from PyPI)
+# (builds from local source tree at version 3.0.0a0)
 docker build --tag cffconvert:3.0.0a0 .
 docker build --tag cffconvert:latest .
 ```
 
 See if the Docker image works as expected:
 ```shell
-docker run --rm -v $PWD:/app cffconvert --validate
-docker run --rm -v $PWD:/app cffconvert --version
-docker run --rm -v $PWD:/app cffconvert
+docker run --rm -v $PWD:/work -w /work cffconvert --version
+docker run --rm -v $PWD:/work -w /work cffconvert
 # etc
 ```
 
