@@ -53,6 +53,10 @@
       "affiliation": "Netherlands eScience Center",
       "name": "Spaaks, Jurriaan H.",
       "orcid": "0000-0002-7064-4069"
+    },
+    {
+      "name": "Lee, Allen",
+      "orcid": "0000-0002-6523-6079"
     }
   ],
   "description": "Command line program to validate and convert CITATION.cff files.",

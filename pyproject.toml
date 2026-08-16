@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 [project]
 # https://packaging.python.org/en/latest/specifications/declaring-project-metadata/#declaring-project-metadata
 authors = [
-    { name = "Jurriaan H. Spaaks", email = "j.spaaks@esciencecenter.nl" }
+    { name = "Jurriaan H. Spaaks", email = "j.spaaks@esciencecenter.nl" },
 ]
 maintainers = [
     { name = "Allen Lee", email = "allen.lee@asu.edu" }

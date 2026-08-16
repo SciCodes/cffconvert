@@ -5,6 +5,9 @@ authors:
     family-names: Spaaks
     given-names: Jurriaan H.
     orcid: https://orcid.org/0000-0002-7064-4069
+  - family-names: Lee
+    given-names: Allen
+    orcid: https://orcid.org/0000-0002-6523-6079
 contributors:
   - affiliation: University of Oslo
     alias: wleoncio
