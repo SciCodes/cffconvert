@@ -69,13 +69,35 @@ docker-build:
 	docker build -t cffconvert .
 
 ## Run cffconvert in the production Docker image (pass args via ARGS)
-## Mounts the host directory at /work to keep the venv at /app intact
+## The image workdir is /work; the host directory is mounted at /work
 docker-run:
-	docker run --rm -v $(PWD):/work -w /work cffconvert $(ARGS)
+	docker run --rm -v $(PWD):/work cffconvert $(ARGS)
 
-## Build and smoke-test the production Docker image (print version)
+## Build and smoke-test the production Docker image
+## Covers: --version; read-only /work stdout conversion; arbitrary-UID
+## writable /work -o conversion; and a mount over /app cannot hide the
+## absolute entrypoint. Uses a temp dir with trap cleanup; leaves no
+## generated output in the repo.
 docker-smoke: docker-build
-	docker run --rm -v $(PWD):/work -w /work cffconvert --version
+	@set -eu; \
+	TMP="$$(mktemp -d)"; \
+	trap 'rm -rf "$$TMP"' EXIT INT TERM; \
+	chmod 755 "$$TMP"; \
+	cp CITATION.cff "$$TMP/CITATION.cff"; \
+	chmod 644 "$$TMP/CITATION.cff"; \
+	mkdir "$$TMP/output"; \
+	chmod 777 "$$TMP/output"; \
+	echo "smoke: --version"; \
+	docker run --rm cffconvert --version; \
+	echo "smoke: read-only /work stdout conversion"; \
+	docker run --rm -v "$$TMP":/work:ro cffconvert -f bibtex | grep -q "@misc{"; \
+	echo "smoke: arbitrary UID writable /work -o conversion"; \
+	docker run --rm --user 4242 -v "$$TMP":/input:ro -v "$$TMP/output":/work cffconvert -i /input/CITATION.cff -o /work/out.bib -f bibtex; \
+	test -s "$$TMP/output/out.bib"; \
+	echo "smoke: /app mount cannot hide the executable"; \
+	echo decoy > "$$TMP/cffconvert"; \
+	docker run --rm -v "$$TMP":/app cffconvert --version; \
+	echo "smoke: OK"
 
 ## Build sdist and wheel distributions into dist/
 build: clean

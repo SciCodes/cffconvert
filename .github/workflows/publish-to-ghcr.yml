@@ -97,3 +97,33 @@ jobs:
           subject-name: ghcr.io/scicodes/cffconvert
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
+
+      - name: Smoke-test the pushed image
+        env:
+          IMAGE: ghcr.io/scicodes/cffconvert@${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          trap 'rm -rf "$tmp"' EXIT
+          chmod 755 "$tmp"
+          cp CITATION.cff "$tmp/CITATION.cff"
+          chmod 644 "$tmp/CITATION.cff"
+          mkdir "$tmp/output"
+          chmod 777 "$tmp/output"
+
+          echo "smoke: --version"
+          docker run --rm "$IMAGE" --version
+
+          echo "smoke: read-only /work stdout conversion"
+          docker run --rm -v "$tmp":/work:ro "$IMAGE" -f bibtex | grep -q "@misc{"
+
+          echo "smoke: arbitrary UID writable /work -o conversion"
+          docker run --rm --user 4242 -v "$tmp":/input:ro -v "$tmp/output":/work "$IMAGE" \
+            -i /input/CITATION.cff -o /work/out.bib -f bibtex
+          test -s "$tmp/output/out.bib"
+
+          echo "smoke: /app mount cannot hide the executable"
+          echo decoy > "$tmp/cffconvert"
+          docker run --rm -v "$tmp":/app "$IMAGE" --version
+
+          echo "smoke: OK"
