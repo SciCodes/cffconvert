@@ -1,3 +1,13 @@
+# v2026.09 (2026-09-10)
+
+## Container
+
+1. Installed `cffconvert` under `/opt/cffconvert`, independently from the client workspace.
+2. Made `/work` the default working directory so client repositories can be mounted without overriding the container working directory.
+3. Added a read-only, stdout-based conversion workflow that avoids host file ownership issues.
+4. Documented direct file output through a writable `/work` mount using the host user's UID and GID.
+5. Added smoke tests for the published image, including read-only input, arbitrary-UID output, and mounts over `/app`.
+
 # v2026.08 (2026-08-16)
 
 ## Schema

@@ -3,7 +3,7 @@
 ## Install in virtual environment
 
 The official interim source distribution is the Git tag attached to a published GitHub Release.
-The first planned concrete example is `v2026.08`. `main` is development-only, and PyPI is not the distribution channel
+The current release tag is `v2026.09`. `main` is development-only, and PyPI is not the distribution channel
 for this fork.
 Replace `<release-tag>` with the published GitHub Release tag in the commands below.
 
@@ -65,7 +65,7 @@ On Google Cloud Function, set `requirements.txt` to:
 cffconvert[gcloud] @ git+https://github.com/SciCodes/cffconvert.git@<release-tag>
 ```
 
-Replace `<release-tag>` with a published GitHub Release tag, such as `v2026.08`.
+Replace `<release-tag>` with a published GitHub Release tag, such as `v2026.09`.
 
 and use the following as `main.py`:
 

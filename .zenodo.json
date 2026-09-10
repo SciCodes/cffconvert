@@ -74,7 +74,7 @@
   "license": {
     "id": "Apache-2.0"
   },
-  "publication_date": "2026-08-16",
+  "publication_date": "2026-09-10",
   "related_identifiers": [
     {
       "identifier": "10.5281/zenodo.1162057",
@@ -89,5 +89,5 @@
   ],
   "title": "cffconvert",
   "upload_type": "software",
-  "version": "2026.8"
+  "version": "2026.9"
 }

@@ -42,12 +42,12 @@ CFF file specifies multiple licenses.
 ## Installing
 
 Install the official interim source distribution from the Git tag attached to a published GitHub Release.
-The first planned concrete example is `v2026.08`.
+The current release tag is `v2026.09`.
 
 ```shell
 python3 -m pip install --user git+https://github.com/scicodes/cffconvert.git@<release-tag>
 ```
-Replace `<release-tag>` with the published GitHub Release tag, for example `v2026.08`.
+Replace `<release-tag>` with the published GitHub Release tag, for example `v2026.09`.
 Untagged `main` is development-only. Do not use PyPI for this fork; the `cffconvert` package name is already in use there.
 Ensure that the user space directory `~/.local/bin/` is on the `PATH`.
 
@@ -77,7 +77,7 @@ See [docs/alternative-install-options.md](docs/alternative-install-options.md) f
 ## Docker
 
 `cffconvert` will be available on GHCR as `ghcr.io/scicodes/cffconvert:<release-tag>` after the GitHub Release for that tag is published.
-For the first planned example release, that tag is `v2026.08`.
+The current release tag is `v2026.09`.
 Replace `<release-tag>` with the published GitHub Release tag.
 Legacy Docker Hub images still exist at https://hub.docker.com/r/citationcff/cffconvert.
 
@@ -111,7 +111,7 @@ docker run --rm ghcr.io/scicodes/cffconvert:<release-tag> --help
 ```yaml
 repos:
   - repo: https://github.com/SciCodes/cffconvert
-    rev: v2026.08
+    rev: v2026.09
     hooks:
       - id: validate-cff
 ```

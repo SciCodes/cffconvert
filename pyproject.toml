@@ -50,7 +50,7 @@ license = "Apache-2.0"
 name = "cffconvert"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "2026.8"
+version = "2026.9"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
