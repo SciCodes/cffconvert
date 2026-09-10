@@ -78,7 +78,8 @@ make test               # run the full test suite (in Docker)
 make test-local         # run the full test suite (locally, requires dev-install)
 make test-version       # run version-consistency checks (in Docker)
 make test-version-local # run version-consistency checks (locally)
-make lint               # run ruff, pyroma
+make lint               # run ruff, pyroma in Docker
+make lint-local         # run ruff, pyroma locally (requires dev-install)
 make precommit          # run all pre-commit hooks
 ```
 
@@ -88,29 +89,30 @@ Build local source artifacts when needed:
 
 ```shell
 make clean        # remove stale build artifacts
-make build        # build sdist + wheel into dist/
+make build        # build sdist + wheel into dist/ using Docker
+make build-local  # build locally (requires dev-install)
 ```
 
 ### Release preparation
 
 Before tagging, update the canonical package version **everywhere** it must be synchronized.
-The package version is `2026.8`; the published release tag is separate (for the first planned release, `v2026.08`).
+The package version is `2026.9`; the published release tag is separate (`v2026.09`).
 The version is checked for consistency by `tests/test_consistent_versioning.py`
 across these files:
 
-1. `pyproject.toml` — `version = "2026.8"`
+1. `pyproject.toml` — `version = "2026.9"`
 2. `src/cffconvert/cli/version.py` — derives `__version__` from installed metadata
-3. `CITATION.cff` — `version: 2026.8`
-4. `.zenodo.json` — `"version": "2026.8"`
+3. `CITATION.cff` — `version: 2026.9`
+4. `.zenodo.json` — `"version": "2026.9"`
 
 Update the version in all of the above, then run:
 
 ```shell
 make test-version   # verify version consistency
-make release-check  # full local validation gate (clean, lint, test, test-version, build)
+make release-check  # full containerized validation gate (clean, lint, test, test-version, build)
 ```
 
-`make release-check` runs the complete local validation gate. It never publishes
+`make release-check` runs the complete containerized validation gate. It never publishes
 anything — it only verifies that the package is ready for release. Do not upload
 this project to PyPI.
 
@@ -121,13 +123,13 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit 
 ### Interim tagged release procedure
 
 The official interim source distribution is the Git tag attached to a published
-GitHub Release. The first planned concrete example is `v2026.08`.
+GitHub Release. The current release tag is `v2026.09`.
 Publishing a GitHub Release for that tag triggers the GHCR workflow.
 
 **Steps:**
 
 1. Ensure `main` is green (CI passes) and `make release-check` succeeds locally.
-2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.08`). The canonical package version remains `2026.8`.
+2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.09`). The canonical package version remains `2026.9`.
 3. Update `CHANGELOG.md` with the release notes for the tag, if desired.
 4. Create an annotated exact tag:
 
@@ -169,7 +171,7 @@ Publishing a GitHub Release for the release tag triggers the GHCR workflow.
 - [ ] All version files updated (`pyproject.toml`, `src/cffconvert/cli/version.py`, `CITATION.cff`, `.zenodo.json`)
 - [ ] `CHANGELOG.md` updated with release notes
 - [ ] `make test-version` passes (version consistency)
-- [ ] `make release-check` passes (full local gate)
+- [ ] `make release-check` passes (full containerized gate)
 - [ ] CI green on `main`
 - [ ] `RELEASE_TAG` set to the intended published release tag
 - [ ] Annotated exact tag created and pushed from `$RELEASE_TAG`

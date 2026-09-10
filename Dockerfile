@@ -24,6 +24,11 @@ ENV PATH="/opt/cffconvert/bin:$PATH"
 
 CMD ["pytest", "tests/"]
 
+FROM test AS dev
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --python /opt/cffconvert/bin/python ".[dev]"
+
 FROM python:3.12-alpine AS runtime
 
 LABEL org.opencontainers.image.source="https://github.com/scicodes/cffconvert"

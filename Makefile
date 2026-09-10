@@ -3,9 +3,9 @@
 
 .PHONY: install dev-install test test-version test-marker \
         test-local test-version-local test-marker-local \
-        lint precommit clean \
-        build release-check help \
-        docker-build docker-run docker-smoke docker-test-build
+        lint lint-local precommit clean \
+        build build-local release-check help \
+        docker-build docker-run docker-smoke docker-test-build docker-dev-build
 
 # Default Python interpreter (use venv python if available, else system python3)
 PYTHON := $(shell command -v python3 2>/dev/null || echo python3)
@@ -24,6 +24,10 @@ dev-install:
 ## Build the test Docker image (includes testing dependencies)
 docker-test-build:
 	docker build --target test -t cffconvert-test .
+
+## Build the development Docker image (includes dev and testing dependencies)
+docker-dev-build:
+	docker build --target dev -t cffconvert-dev .
 
 ## Run the full test suite in Docker
 test: docker-test-build
@@ -49,8 +53,13 @@ test-version-local:
 test-marker-local:
 	pytest -m $(M)
 
-## Run all linters (ruff, pyroma)
-lint:
+## Run all linters in Docker (ruff, pyroma)
+lint: docker-dev-build
+	docker run --rm cffconvert-dev ruff check --no-cache src/cffconvert tests
+	docker run --rm cffconvert-dev pyroma .
+
+## Run all linters locally (requires dev-install)
+lint-local:
 	ruff check src/cffconvert tests
 	pyroma .
 
@@ -99,13 +108,24 @@ docker-smoke: docker-build
 	docker run --rm -v "$$TMP":/app cffconvert --version; \
 	echo "smoke: OK"
 
-## Build sdist and wheel distributions into dist/
-build: clean
+## Build sdist and wheel distributions into dist/ using Docker
+build: clean docker-dev-build
+	docker run --rm --user "$$(id -u):$$(id -g)" -e HOME=/tmp \
+		-v "$(PWD):/repo" -w /repo cffconvert-dev python -m build
+
+## Build sdist and wheel distributions locally into dist/
+build-local: clean
 	$(PYTHON) -m build
 
-## Run the full local release validation gate (never publishes)
+## Run the full containerized release validation gate (never publishes)
 release-check: clean lint test test-version build
 
 ## Show available targets
 help:
-	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //'
+	@awk '\
+		/^## / { description = description (description ? " " : "") substr($$0, 4); next } \
+		/^[[:alnum:]_.-]+:/ { \
+			target = $$1; sub(/:.*/, "", target); \
+			if (description) printf "%-24s %s\n", target, description; \
+			description = ""; \
+		}' $(MAKEFILE_LIST)

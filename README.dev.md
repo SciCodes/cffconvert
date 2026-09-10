@@ -38,7 +38,7 @@ make install        # install runtime deps only
 ## Interim distribution
 
 The official interim source distribution is the Git tag attached to a published GitHub Release.
-The first planned concrete example is `v2026.08`.
+The current release tag is `v2026.09`.
 Publish a GitHub Release for that tag to trigger GHCR; use `main` only for development, not as a distribution source.
 
 ## Testing
@@ -140,7 +140,8 @@ pre-commit install
 Alternatively, you can run all linters via the Makefile:
 
 ```shell
-make lint            # ruff, pyroma
+make lint            # ruff, pyroma in Docker
+make lint-local      # ruff, pyroma locally (requires dev-install)
 make precommit       # pre-commit run --all-files
 ```
 
@@ -375,16 +376,16 @@ version checks, GHCR preparation, and the release checklist.
 ### Building the docker image
 
 ```shell
-# (builds a self-contained image from the local source tree at version v2026.08)
-docker build --tag cffconvert:v2026.08 .
+# (builds a self-contained image from the local source tree at version v2026.09)
+docker build --tag cffconvert:v2026.09 .
 ```
 
 The image installs `cffconvert` independently and uses `/work` as its working directory, so no `-w` flag is needed.
 
 See if the Docker image works as expected:
 ```shell
-docker run --rm cffconvert:v2026.08 --version
-docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.08 -f bibtex
+docker run --rm cffconvert:v2026.09 --version
+docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.09 -f bibtex
 # etc
 ```
 
@@ -392,7 +393,7 @@ docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.08 -f bibtex
 
 Publishing a GitHub Release for the release tag triggers the `publish-to-ghcr.yml` workflow, which publishes
 `ghcr.io/scicodes/cffconvert:<release-tag>` and uses the `ghcr` environment as a deployment gate.
-For the first planned example release, the tag is `v2026.08`.
+The current release tag is `v2026.09`.
 No secrets are needed for that environment.
 Replace `<release-tag>` with the published GitHub Release tag in the commands below.
 
