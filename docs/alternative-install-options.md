@@ -78,18 +78,26 @@ def main(request):
 
 ### Docker
 
-Build the Docker container
+Build the Docker container from a project root:
 
 ```shell
 cd <project root>
 docker build --tag cffconvert:<release-tag> .
 ```
 
-Run the Docker container
+The image installs `cffconvert` independently and uses `/work` as its working directory, so no `-w` flag is needed.
+
+Convert to stdout with a read-only mount from the directory that contains your `CITATION.cff`:
 
 ```shell
 cd <where your CITATION.cff is>
-docker run --rm -ti -v "${PWD}":/work -w /work cffconvert:<release-tag>
+docker run --rm -v "${PWD}:/work:ro" cffconvert:<release-tag> -f bibtex > CITATION.bib
+```
+
+Or write directly to the mount (run as your host user and mount `/work` writable):
+
+```shell
+docker run --rm --user "$(id -u):$(id -g)" -v "${PWD}:/work" cffconvert:<release-tag> -f bibtex -o CITATION.bib
 ```
 
 ### Platform-specific packages

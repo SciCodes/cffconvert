@@ -156,7 +156,7 @@ Publishing a GitHub Release for the release tag triggers the GHCR workflow.
 
    ```shell
    docker build --tag ghcr.io/scicodes/cffconvert:$RELEASE_TAG .
-   docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:$RELEASE_TAG --version
+   docker run --rm ghcr.io/scicodes/cffconvert:$RELEASE_TAG --version
    ```
 
 3. Publish a GitHub Release for `$RELEASE_TAG` to trigger

@@ -81,13 +81,26 @@ For the first planned example release, that tag is `v2026.08`.
 Replace `<release-tag>` with the published GitHub Release tag.
 Legacy Docker Hub images still exist at https://hub.docker.com/r/citationcff/cffconvert.
 
-Example usage:
+The image ships with `cffconvert` installed and does not depend on your host: mount your project at the default working directory `/work` and no `-w` flag is needed.
+
+Convert to stdout with a read-only mount:
 
 ```shell
-docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --validate
-docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --version
-docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --help
-# etc
+docker run --rm -v "$PWD:/work:ro" ghcr.io/scicodes/cffconvert:<release-tag> -f bibtex > CITATION.bib
+```
+
+To write the output directly to the mount, run as your host user and mount `/work` writable:
+
+```shell
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" ghcr.io/scicodes/cffconvert:<release-tag> -f bibtex -o CITATION.bib
+```
+
+Other common invocations:
+
+```shell
+docker run --rm -v "$PWD:/work:ro" ghcr.io/scicodes/cffconvert:<release-tag> --validate
+docker run --rm ghcr.io/scicodes/cffconvert:<release-tag> --version
+docker run --rm ghcr.io/scicodes/cffconvert:<release-tag> --help
 ```
 
 ## `pre-commit` hook

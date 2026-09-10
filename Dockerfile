@@ -12,15 +12,16 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv venv /app/.venv && \
-    uv pip install --python /app/.venv/bin/python .
+    uv venv /opt/cffconvert && \
+    uv pip install --python /opt/cffconvert/bin/python .
 
 FROM builder AS test
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --python /app/.venv/bin/python ".[testing]"
+    uv pip install --python /opt/cffconvert/bin/python ".[testing]"
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/opt/cffconvert/bin:$PATH"
+
 CMD ["pytest", "tests/"]
 
 FROM python:3.12-alpine AS runtime
@@ -28,13 +29,15 @@ FROM python:3.12-alpine AS runtime
 LABEL org.opencontainers.image.source="https://github.com/scicodes/cffconvert"
 
 RUN addgroup -S -g 10001 cffconvert && \
-    adduser -S -D -H -u 10001 -G cffconvert cffconvert
+    adduser -S -D -H -u 10001 -G cffconvert cffconvert && \
+    mkdir -p /work && \
+    chmod 0777 /work
 
-COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /opt/cffconvert /opt/cffconvert
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/opt/cffconvert/bin:$PATH"
 
-WORKDIR /app
+WORKDIR /work
 USER 10001:10001
 
-ENTRYPOINT ["cffconvert"]
+ENTRYPOINT ["/opt/cffconvert/bin/cffconvert"]

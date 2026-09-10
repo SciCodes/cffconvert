@@ -375,14 +375,16 @@ version checks, GHCR preparation, and the release checklist.
 ### Building the docker image
 
 ```shell
-# (builds from local source tree at version v2026.08)
+# (builds a self-contained image from the local source tree at version v2026.08)
 docker build --tag cffconvert:v2026.08 .
 ```
 
+The image installs `cffconvert` independently and uses `/work` as its working directory, so no `-w` flag is needed.
+
 See if the Docker image works as expected:
 ```shell
-docker run --rm -v "$PWD":/work -w /work cffconvert:v2026.08 --version
-docker run --rm -v "$PWD":/work -w /work cffconvert:v2026.08
+docker run --rm cffconvert:v2026.08 --version
+docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.08 -f bibtex
 # etc
 ```
 
@@ -401,6 +403,6 @@ The image will only exist after a successful workflow run, so use a local smoke 
 
 ```shell
 docker build --tag ghcr.io/scicodes/cffconvert:<release-tag> .
-docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --version
-docker run --rm -v "$PWD":/work -w /work ghcr.io/scicodes/cffconvert:<release-tag> --help
+docker run --rm ghcr.io/scicodes/cffconvert:<release-tag> --version
+docker run --rm ghcr.io/scicodes/cffconvert:<release-tag> --help
 ```
