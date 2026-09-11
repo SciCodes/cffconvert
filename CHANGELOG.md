@@ -1,5 +1,9 @@
 # v2026.09 (2026-09-10)
 
+## CLI
+
+1. Added repeatable `--output`/`-O` options for writing multiple formats in one invocation, with optional custom paths.
+
 ## Container
 
 1. Installed `cffconvert` under `/opt/cffconvert`, independently from the client workspace.

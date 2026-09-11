@@ -141,6 +141,9 @@ Options:
   -o, --outfile PATH              Path to the output file.
   -f, --format [apalike|bibtex|cff|codemeta|endnote|ris|schema.org|zenodo]
                                   Output format.
+  -O, --output FORMAT[=PATH]      Write an output format to a file. Can be used
+                                  multiple times. Uses default output paths when
+                                  PATH is omitted.
   -u, --url TEXT                  URL to the CITATION.cff input file.
   -h, --help                      Show help and exit.
   --show-trace                    Show error trace.
@@ -203,4 +206,25 @@ cffconvert -f bibtex -o bibtex.bib
 cffconvert -f zenodo -o .zenodo.json
 cffconvert -f endnote -o ${PWD}/endnote.enw
 # etc
+```
+
+### Writing multiple formats
+
+Use `--output`/`-O` multiple times to write several formats in one invocation.
+When no path is supplied, each format uses its conventional default: `_citation.txt`, `_citation.bib`,
+`_citation.cff`, `codemeta.json`, `_citation.enw`, `_citation.ris`, `schemaorg.json`, or `.zenodo.json`.
+
+```shell
+cffconvert -O apalike -O bibtex
+cffconvert -O apalike=my-citation.txt -O bibtex=my-citation.bib
+```
+
+For Docker with stdin input:
+
+```shell
+docker run --rm -i \
+  --user "$(id -u):$(id -g)" \
+  -v "$PWD:/work" \
+  ghcr.io/scicodes/cffconvert:<release-tag> \
+  -i /dev/stdin -O apalike -O bibtex < CITATION.cff
 ```

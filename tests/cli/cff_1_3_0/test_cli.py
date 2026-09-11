@@ -81,6 +81,76 @@ def test_writing_to_file(fmt, fname, cffstr):
 
 
 @pytest.mark.cli
+def test_writing_multiple_outputs_to_default_files(cffstr):
+    expected_apalike = read_sibling_file(__file__, "apalike.txt")
+    expected_bibtex = read_sibling_file(__file__, "bibtex.bib")
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("CITATION.cff", "wt", encoding="utf-8") as fid:
+            fid.write(cffstr)
+        result = runner.invoke(cffconvert, ["--output", "apalike", "--output", "bibtex"])
+        with open("_citation.txt", "rt", encoding="utf-8") as fid:
+            actual_apalike = fid.read()
+        with open("_citation.bib", "rt", encoding="utf-8") as fid:
+            actual_bibtex = fid.read()
+    assert result.exit_code == 0
+    assert result.output == ""
+    assert expected_apalike == actual_apalike
+    assert expected_bibtex == actual_bibtex
+
+
+@pytest.mark.cli
+def test_writing_multiple_outputs_to_custom_files(cffstr):
+    expected_apalike = read_sibling_file(__file__, "apalike.txt")
+    expected_bibtex = read_sibling_file(__file__, "bibtex.bib")
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("CITATION.cff", "wt", encoding="utf-8") as fid:
+            fid.write(cffstr)
+        result = runner.invoke(cffconvert, ["-O", "apalike=my-citation.txt", "-O", "bibtex=my-citation.bib"])
+        with open("my-citation.txt", "rt", encoding="utf-8") as fid:
+            actual_apalike = fid.read()
+        with open("my-citation.bib", "rt", encoding="utf-8") as fid:
+            actual_bibtex = fid.read()
+    assert result.exit_code == 0
+    assert result.output == ""
+    assert expected_apalike == actual_apalike
+    assert expected_bibtex == actual_bibtex
+
+
+@pytest.mark.cli
+@pytest.mark.parametrize(
+    "output_specification, error_message",
+    [
+        ("unsupported", "is not one of"),
+        ("bibtex=", "output path cannot be empty"),
+    ],
+)
+def test_rejecting_invalid_output_specification(output_specification, error_message):
+    runner = CliRunner()
+    result = runner.invoke(cffconvert, ["-O", output_specification])
+    assert result.exit_code == 2
+    assert error_message in result.output
+
+
+@pytest.mark.cli
+def test_default_cff_output_does_not_overwrite_input(cffstr):
+    expected = read_sibling_file(__file__, "CITATION.cff")
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("CITATION.cff", "wt", encoding="utf-8") as fid:
+            fid.write(cffstr)
+        result = runner.invoke(cffconvert, ["-O", "cff"])
+        with open("CITATION.cff", "rt", encoding="utf-8") as fid:
+            actual_input = fid.read()
+        with open("_citation.cff", "rt", encoding="utf-8") as fid:
+            actual_output = fid.read()
+    assert result.exit_code == 0
+    assert actual_input == cffstr
+    assert actual_output == expected
+
+
+@pytest.mark.cli
 def test_cff_1_3_metadata_end_to_end():
     cffstr = """authors:
   - name: Test organization

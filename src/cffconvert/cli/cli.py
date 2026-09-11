@@ -3,7 +3,21 @@ import sys
 import click
 from cffconvert.cli.check_early_exits import check_early_exits
 from cffconvert.cli.create_citation import create_citation
+from cffconvert.cli.validate_or_write_output import DEFAULT_OUTPUT_FILES
+from cffconvert.cli.validate_or_write_output import OUTPUT_FORMATS
 from cffconvert.cli.validate_or_write_output import validate_or_write_output
+
+
+def parse_output_format(ctx, _param, value):
+    parsed = []
+    for item in value:
+        outputformat, separator, outfile = item.partition("=")
+        if outputformat not in OUTPUT_FORMATS:
+            raise click.BadParameter(f"{outputformat!r} is not one of {', '.join(OUTPUT_FORMATS)}")
+        if separator and not outfile:
+            raise click.BadParameter("output path cannot be empty")
+        parsed.append((outputformat, outfile or DEFAULT_OUTPUT_FILES[outputformat]))
+    return tuple(parsed)
 
 
 options = {
@@ -19,18 +33,16 @@ options = {
         "help": "Path to the output file."
     },
     "outputformat": {
-        "type": click.Choice([
-            "apalike",
-            "bibtex",
-            "cff",
-            "codemeta",
-            "endnote",
-            "ris",
-            "schema.org",
-            "zenodo"
-        ]),
+        "type": click.Choice(OUTPUT_FORMATS),
         "default": None,
         "help": "Output format."
+    },
+    "outputformats": {
+        "multiple": True,
+        "callback": parse_output_format,
+        "metavar": "FORMAT[=PATH]",
+        "help": "Write an output format to a file. Can be used multiple times. "
+                "Uses default output paths when PATH is omitted."
     },
     "url": {
         "type": str,
@@ -73,6 +85,7 @@ https://github.com/SciCodes/cffconvert"""
 @click.option("-i", "--infile", "infile", **options["infile"])
 @click.option("-o", "--outfile", "outfile", **options["outfile"])
 @click.option("-f", "--format", "outputformat", **options["outputformat"])
+@click.option("-O", "--output", "outputformats", **options["outputformats"])
 @click.option("-u", "--url", "url", **options["url"])
 @click.option("-h", "--help", "show_help", **options["show_help"])
 @click.option("--show-trace", "show_trace", **options["show_trace"])
@@ -80,7 +93,7 @@ https://github.com/SciCodes/cffconvert"""
 @click.option("--version", "version", **options["version"])
 @click.option("--verbose", "verbose", **options["verbose"])
 # pylint: disable=too-many-arguments
-def cli(infile, outfile, outputformat, url, show_help, show_trace, validate_only, version, verbose):
+def cli(infile, outfile, outputformat, outputformats, url, show_help, show_trace, validate_only, version, verbose):
     """Command line program to validate and convert CITATION.cff files."""
 
     check_early_exits(show_help, version)
@@ -97,4 +110,4 @@ def cli(infile, outfile, outputformat, url, show_help, show_trace, validate_only
     citation = create_citation(infile, url)
 
     # either validate and exit, or convert to the selected output format
-    validate_or_write_output(outfile, outputformat, validate_only, citation, verbose)
+    validate_or_write_output(outfile, outputformat, outputformats, validate_only, citation, verbose)
