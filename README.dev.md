@@ -38,7 +38,7 @@ make install        # install runtime deps only
 ## Interim distribution
 
 The official interim source distribution is the Git tag attached to a published GitHub Release.
-The current release tag is `v2026.09`.
+The current release tag is `v2026.09.1`.
 Publish a GitHub Release for that tag to trigger GHCR; use `main` only for development, not as a distribution source.
 
 ## Testing
@@ -376,16 +376,16 @@ version checks, GHCR preparation, and the release checklist.
 ### Building the docker image
 
 ```shell
-# (builds a self-contained image from the local source tree at version v2026.09)
-docker build --tag cffconvert:v2026.09 .
+# (builds a self-contained image from the local source tree at version v2026.09.1)
+docker build --tag cffconvert:v2026.09.1 .
 ```
 
 The image installs `cffconvert` independently and uses `/work` as its working directory, so no `-w` flag is needed.
 
 See if the Docker image works as expected:
 ```shell
-docker run --rm cffconvert:v2026.09 --version
-docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.09 -f bibtex
+docker run --rm cffconvert:v2026.09.1 --version
+docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.09.1 -f bibtex
 # etc
 ```
 
@@ -393,7 +393,7 @@ docker run --rm -v "$PWD:/work:ro" cffconvert:v2026.09 -f bibtex
 
 Publishing a GitHub Release for the release tag triggers the `publish-to-ghcr.yml` workflow, which publishes
 `ghcr.io/scicodes/cffconvert:<release-tag>` and uses the `ghcr` environment as a deployment gate.
-The current release tag is `v2026.09`.
+The current release tag is `v2026.09.1`.
 No secrets are needed for that environment.
 Replace `<release-tag>` with the published GitHub Release tag in the commands below.
 

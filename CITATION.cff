@@ -70,7 +70,7 @@ message: If you use this software, please cite it using these metadata.
 repository-code: https://github.com/SciCodes/cffconvert
 title: cffconvert
 type: software
-version: "2026.9"
+version: "2026.9.1"
 references:
   - authors:
       - affiliation: Netherlands eScience Center

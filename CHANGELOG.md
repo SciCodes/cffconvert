@@ -1,3 +1,9 @@
+# v2026.09.1 (2026-09-10)
+
+## CLI
+
+1. Added repeatable `--output`/`-O` options for writing multiple formats in one invocation, with optional custom paths or default paths.
+
 # v2026.09 (2026-09-10)
 
 ## CLI

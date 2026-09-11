@@ -96,14 +96,14 @@ make build-local  # build locally (requires dev-install)
 ### Release preparation
 
 Before tagging, update the canonical package version **everywhere** it must be synchronized.
-The package version is `2026.9`; the published release tag is separate (`v2026.09`).
+The package version is `2026.9.1`; the published release tag is separate (`v2026.09.1`).
 The version is checked for consistency by `tests/test_consistent_versioning.py`
 across these files:
 
-1. `pyproject.toml` — `version = "2026.9"`
+1. `pyproject.toml` — `version = "2026.9.1"`
 2. `src/cffconvert/cli/version.py` — derives `__version__` from installed metadata
-3. `CITATION.cff` — `version: 2026.9`
-4. `.zenodo.json` — `"version": "2026.9"`
+3. `CITATION.cff` — `version: 2026.9.1`
+4. `.zenodo.json` — `"version": "2026.9.1"`
 
 Update the version in all of the above, then run:
 
@@ -123,13 +123,13 @@ Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit 
 ### Interim tagged release procedure
 
 The official interim source distribution is the Git tag attached to a published
-GitHub Release. The current release tag is `v2026.09`.
+GitHub Release. The current release tag is `v2026.09.1`.
 Publishing a GitHub Release for that tag triggers the GHCR workflow.
 
 **Steps:**
 
 1. Ensure `main` is green (CI passes) and `make release-check` succeeds locally.
-2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.09`). The canonical package version remains `2026.9`.
+2. Set `RELEASE_TAG` to the intended published release tag (for example, `v2026.09.1`). The canonical package version remains `2026.9.1`.
 3. Update `CHANGELOG.md` with the release notes for the tag, if desired.
 4. Create an annotated exact tag:
 
